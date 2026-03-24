@@ -1,0 +1,181 @@
+╔════════════════════════════════════════════════════════════════════╗
+║  CLAUDE CODE CONTRACTS — Standalone System                        ║
+║  Complete Self-Contained Folder Structure                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+Location: /Users/alex/.openclaw/workspace/claude-code-contracts/
+
+├── README.md (9.2 KB)
+│   └─ System overview, file guide, quick start instructions
+│
+├── START-HERE.md (4.7 KB) ⭐ READ FIRST
+│   └─ Quick 2-minute overview and 5-step getting started
+│
+├── MANIFEST.md (10 KB)
+│   └─ Complete file index, reading paths, system overview
+│
+├── DELIVERY-SUMMARY.md (11 KB)
+│   └─ What you got, how to use it, quick checklist
+│
+├── FILE-STRUCTURE.txt (this file)
+│   └─ Directory structure reference
+│
+├── CLAUDE-CODE-CONTRACT.md (12 KB) ⭐ CORE DOCUMENT
+│   └─ Quality standards, type hints, testing, documentation
+│   ├─ Section: Type Hints (100% Required)
+│   ├─ Section: Testing (≥80% Coverage)
+│   ├─ Section: Error Handling
+│   ├─ Section: Documentation
+│   ├─ Section: Project Structure
+│   ├─ Section: Python Standards
+│   ├─ Section: TypeScript Standards
+│   └─ Section: Pre-Delivery Checklist
+│
+├── CLAUDE-CODE-GUIDE.md (12 KB) ⭐ HOW-TO GUIDE
+│   └─ Complete walkthrough with examples
+│   ├─ Step 1: Fill TASK-BRIEF.md
+│   ├─ Step 2: Spawn Claude Code Session
+│   ├─ Step 3: Claude Code Generates
+│   ├─ Step 4: Verify & Ship
+│   ├─ Example: GitHub Issue Triage System
+│   ├─ Customization Guidelines
+│   └─ Rejection Protocol
+│
+├── CLAUDE-CODE-CHEATSHEET.md (11 KB) ⭐ QUICK REFERENCE
+│   └─ Copy-paste templates, quick formulas, boilerplate
+│   ├─ TL;DR Formula
+│   ├─ Command to Spawn Claude Code
+│   ├─ Language-Specific Templates
+│   ├─ Quality Checklist
+│   ├─ Anti-Patterns (Never Accept)
+│   ├─ Common Issues & Fixes
+│   ├─ Pro Tips
+│   ├─ Boilerplate Code Snippets
+│   └─ Final Sanity Check
+│
+├── TASK-BRIEF-TEMPLATE.md (4.7 KB) ⭐ COPY FOR EACH PROJECT
+│   └─ Project requirements template
+│   ├─ Project (name, language, framework)
+│   ├─ Problem Statement
+│   ├─ Functional Requirements
+│   ├─ Non-Functional Requirements
+│   ├─ Constraints
+│   ├─ User Experience (Input/Output)
+│   ├─ Architecture Hints
+│   ├─ Success Criteria
+│   ├─ Known Unknowns
+│   └─ Notes
+│
+├── CODING-CONTEXT.md (4.2 KB) ⭐ LANGUAGE STANDARDS
+│   └─ Language-specific rules (Python, TypeScript, Go)
+│   ├─ Type Hints (Python/TypeScript)
+│   ├─ Formatting Standards
+│   ├─ Error Handling Patterns
+│   ├─ Logging Standards
+│   ├─ Testing Standards
+│   ├─ Cache-Friendly Patterns
+│   └─ Visual Validation (for UI projects)
+│
+└── prompts/
+    └─ PROMPT-CLAUDE-CODE-MASTER.md (9 KB) ⭐ MASTER PROMPT
+       └─ Complete prompt for Claude Code
+       ├─ System Context
+       ├─ Task Definition
+       ├─ Requirements (Architecture, Type System, Testing, etc.)
+       ├─ Failure Modes
+       ├─ Success Criteria
+       └─ Final Handoff Format
+
+════════════════════════════════════════════════════════════════════
+
+TOTAL: 100 KB, 11 files (8 markdown + 3 text), fully self-contained
+
+════════════════════════════════════════════════════════════════════
+
+🎯 CORE FILES (Attach These to Claude Code)
+
+When spawning a Claude Code session, attach:
+  1. CLAUDE-CODE-CONTRACT.md          (standards)
+  2. CODING-CONTEXT.md                 (language rules)
+  3. TASK-BRIEF.md                     (your project — copy from template)
+  4. prompts/PROMPT-CLAUDE-CODE-MASTER.md (what Claude sees)
+
+════════════════════════════════════════════════════════════════════
+
+📖 READING PATHS
+
+Path 1: Fast Track (5 min)
+  1. START-HERE.md
+  2. Copy TASK-BRIEF-TEMPLATE.md
+  3. Go!
+
+Path 2: Complete (30 min)
+  1. START-HERE.md
+  2. CLAUDE-CODE-GUIDE.md
+  3. CLAUDE-CODE-CHEATSHEET.md
+  4. Copy TASK-BRIEF-TEMPLATE.md
+  5. Go!
+
+Path 3: Reference Lookup (1 min)
+  1. CLAUDE-CODE-CHEATSHEET.md
+  2. Copy TASK-BRIEF-TEMPLATE.md
+  3. Go!
+
+Path 4: Understanding (deep dive)
+  1. MANIFEST.md (overview)
+  2. CLAUDE-CODE-CONTRACT.md (standards)
+  3. CLAUDE-CODE-GUIDE.md (how-to)
+  4. CODING-CONTEXT.md (customization)
+
+════════════════════════════════════════════════════════════════════
+
+✅ QUALITY STANDARDS (Always Enforced)
+
+Every Claude Code project must deliver:
+  ✓ 100% type hints on public APIs
+  ✓ ≥80% test coverage (all tests pass)
+  ✓ Zero TODOs (complete code)
+  ✓ Zero linting warnings
+  ✓ Zero type errors
+  ✓ Working setup script (./setup.sh)
+  ✓ Accurate README with examples
+  ✓ Ready to git commit immediately
+
+════════════════════════════════════════════════════════════════════
+
+🚀 HOW IT WORKS
+
+1. Fill TASK-BRIEF.md
+   (your project name, language, 3 requirements, success criteria)
+
+2. Attach 4 files to Claude Code
+   (CONTRACT, CONTEXT, BRIEF, MASTER-PROMPT)
+
+3. Claude Code reads contract
+   (knows exact quality expectations)
+
+4. Claude Code generates code
+   (meeting all standards automatically)
+
+5. You verify
+   (make test, make lint, git status)
+
+6. You ship
+   (code is production-ready, no iteration)
+
+════════════════════════════════════════════════════════════════════
+
+📍 LOCATION
+
+/Users/alex/.openclaw/workspace/claude-code-contracts/
+
+👉 BOOKMARK THIS PATH — You'll use it for every Claude Code project
+
+════════════════════════════════════════════════════════════════════
+
+🎓 NEXT STEP
+
+Open: START-HERE.md
+Then: Follow the quick start guide
+
+════════════════════════════════════════════════════════════════════
