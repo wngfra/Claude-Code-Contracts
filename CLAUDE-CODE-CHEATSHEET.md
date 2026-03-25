@@ -36,41 +36,36 @@ That's it. Claude Code handles the rest.
 
 ---
 
-## 2. Command to Spawn Claude Code
+## 2. Start Claude Code
 
-### Option A: Direct (if ACP configured)
+### Claude Code CLI (recommended)
+
 ```bash
-openclaw acp --session claude-code << 'EOF'
-Generate production code per TASK-BRIEF.md following CLAUDE-CODE-CONTRACT.md
+cd ~/my-project
+claude
 
-Must include:
-- Source code (src/)
-- Tests (tests/) with ≥80% coverage
-- Type hints (100%)
-- Setup script & Makefile
-- README with examples
-- .env.example
-- Ready to git commit
+# Inside the session, load contract files:
+> /add /path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md
+> /add /path/to/claude-code-contracts/CODING-CONTEXT.md
+> /add /path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md
+> /add TASK-BRIEF.md
 
-Quality: Zero TODOs, zero warnings, all tests pass.
-EOF
+# Then type your prompt:
+> Generate production code following CLAUDE-CODE-CONTRACT.md and TASK-BRIEF.md
 ```
 
-### Option B: Via Python
-```python
-spawn_session(
-    runtime="acp",
-    agentId="claude-code",
-    mode="session",
-    task="Generate production code following CLAUDE-CODE-CONTRACT.md",
-    attachments=[
-        ("CLAUDE-CODE-CONTRACT.md", read("contracts/CLAUDE-CODE-CONTRACT.md")),
-        ("CODING-CONTEXT.md", read("contracts/CODING-CONTEXT.md")),
-        ("TASK-BRIEF.md", read("TASK-BRIEF.md")),
-        ("PROMPT-CLAUDE-CODE-MASTER.md", read("contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md")),
-    ]
-)
+### One-shot (pipe mode)
+
+```bash
+cat CLAUDE-CODE-CONTRACT.md CODING-CONTEXT.md prompts/PROMPT-CLAUDE-CODE-MASTER.md TASK-BRIEF.md \
+  | claude --print "Generate production code following the attached contract and task brief."
 ```
+
+### Claude.ai (web)
+
+1. Start a new conversation
+2. Attach: `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `TASK-BRIEF.md`, `prompts/PROMPT-CLAUDE-CODE-MASTER.md`
+3. Type: *"Generate production code following CLAUDE-CODE-CONTRACT.md and TASK-BRIEF.md"*
 
 ---
 
@@ -444,22 +439,7 @@ def cache_users(ttl: int = 300):
 
 ---
 
-## 11. When to Use This vs When to Use Sonnet
-
-| Task | Use Claude Code | Use Sonnet |
-|---|---|---|
-| Generate new project | ✅ Claude Code | — |
-| Fix specific bug | — | ✅ Sonnet |
-| Add feature to existing code | ✅ Claude Code | ✅ Sonnet |
-| Review architecture | — | ✅ Sonnet |
-| Optimize performance | — | ✅ Sonnet |
-| Write tests for existing code | — | ✅ Sonnet |
-| Refactor large module | ✅ Claude Code | ✅ Sonnet |
-| One-off script | — | ✅ Sonnet |
-
----
-
-## 12. Boilerplate Code Snippets
+## 11. Boilerplate Code Snippets
 
 ### Error Handling (Python)
 ```python
@@ -602,7 +582,7 @@ User safe_fetch(const std::string &user_id) {
 
 ---
 
-## 13. Final Sanity Check
+## 12. Final Sanity Check
 
 Before you ship, ask yourself:
 

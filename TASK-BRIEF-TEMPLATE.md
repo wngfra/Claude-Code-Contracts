@@ -181,34 +181,6 @@ Example:
 
 ---
 
-## File Delivery
-
-**Where should output go?**
-
-```
-/Users/alex/.openclaw/workspace/projects/[project-name]/
-├── src/
-├── tests/
-├── README.md
-└── setup.sh
-```
-
-**Format:**
-- [ ] Zip file
-- [ ] Individual files
-- [ ] Git repo (init + commit)
-
----
-
-## Timeline
-
-**When do you need this?**
-
-- [ ] ASAP (urgent)
-- [ ] This week
-- [ ] Next week
-- [ ] Whenever
-
 ---
 
 ## Notes
@@ -226,11 +198,4 @@ Example:
 
 ## Ready to Start?
 
-Copy this template, fill it out completely, and pass it to Claude Code with:
-
-```
-system_prompt: "Generate code following CLAUDE-CODE-CONTRACT.md"
-files: [CLAUDE-CODE-CONTRACT.md, CODING-CONTEXT.md, TASK-BRIEF.md]
-```
-
-**Don't start until TASK-BRIEF is complete.**
+Copy this template, fill it out, and give it to Claude along with `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, and `prompts/PROMPT-CLAUDE-CODE-MASTER.md`. See README.md for how to do this with the CLI, web, or API.
