@@ -58,7 +58,7 @@ git status   # ready
 | **PROMPT-CLAUDE-CODE-MASTER.md** | What Claude Code sees (master prompt) | Want to customize |
 | **CLAUDE-CODE-CHEATSHEET.md** | Quick reference, copy-paste templates | During a project |
 | **TASK-BRIEF-TEMPLATE.md** | Copy this for each new project | Starting a project |
-| **CODING-CONTEXT.md** | Language-specific rules (Python/TS/Go) | Customizing for your languages |
+| **CODING-CONTEXT.md** | Language-specific rules (Python/TS/Go/Rust/C/C++) | Customizing for your languages |
 
 ---
 
@@ -192,8 +192,8 @@ claude code \
 ### One-Shot Generation
 No iteration. Code is complete, tested, documented on first run.
 
-### Language Agnostic
-Works with Python, TypeScript, Go, and more.
+### Multi-Language
+Works with Python, TypeScript, Go, Rust, C, and C++.
 
 ### Portable
 No dependencies on OpenClaw, tools, or specific IDEs. Just Claude Code + contracts.

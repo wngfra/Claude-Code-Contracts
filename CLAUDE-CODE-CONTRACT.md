@@ -51,7 +51,7 @@ project/
 ├── .env.example       # Environment template
 ├── README.md          # Setup + usage
 ├── Makefile           # `make test`, `make lint`, `make run`
-└── pyproject.toml / package.json / go.mod
+└── pyproject.toml / package.json / go.mod / Cargo.toml / CMakeLists.txt
 ```
 
 ### Module Organization
@@ -268,15 +268,488 @@ describe('GET /api/users', () => {
 
 ---
 
+## 🦀 Rust-Specific Standards
+
+### Type System & Safety (Required)
+```rust
+use std::fmt;
+use thiserror::Error;
+
+#[derive(Debug, Clone)]
+pub struct User {
+    pub id: String,
+    pub name: String,
+    pub email: Option<String>,
+    pub metadata: std::collections::HashMap<String, String>,
+}
+
+/// Fetch users from database.
+///
+/// # Arguments
+/// * `limit` - Maximum number of users to return.
+///
+/// # Errors
+/// Returns `DatabaseError` if the query fails.
+pub fn fetch_users(limit: usize) -> Result<Vec<User>, DatabaseError> {
+    // ...
+}
+
+pub async fn process_async(user: &User) -> Result<String, ApplicationError> {
+    // ...
+}
+```
+
+### Formatting
+- **Formatter:** `rustfmt` (cargo fmt)
+- **Linting:** `clippy` with `-D warnings` (zero warnings)
+- **Naming:** `snake_case` for functions/vars, `PascalCase` for types/traits, `UPPER_SNAKE` for constants
+
+### Error Handling
+```rust
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum ApplicationError {
+    #[error("validation error: {0}")]
+    Validation(String),
+
+    #[error("not found: {0}")]
+    NotFound(String),
+
+    #[error("database error: {source}")]
+    Database {
+        #[from]
+        source: sqlx::Error,
+    },
+}
+
+pub fn validate_email(email: &str) -> Result<String, ApplicationError> {
+    if email.is_empty() || !email.contains('@') {
+        return Err(ApplicationError::Validation(
+            format!("Invalid email: {email}")
+        ));
+    }
+    Ok(email.to_lowercase())
+}
+```
+
+### Logging
+```rust
+use tracing::{info, debug, error};
+
+pub fn process_user(user_id: &str) -> Result<(), ApplicationError> {
+    info!(user_id, "Processing user");
+    match fetch_user(user_id) {
+        Ok(user) => {
+            debug!(?user, "Fetched user");
+            Ok(())
+        }
+        Err(e) => {
+            error!(user_id, error = %e, "Failed to process user");
+            Err(e)
+        }
+    }
+}
+```
+
+### Testing
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_user_creation() {
+        let user = User {
+            id: "123".into(),
+            name: "Alice".into(),
+            email: None,
+            metadata: Default::default(),
+        };
+        assert_eq!(user.id, "123");
+        assert!(user.email.is_none());
+    }
+
+    #[test]
+    fn test_validate_email_invalid() {
+        let result = validate_email("invalid");
+        assert!(result.is_err());
+    }
+}
+
+// tests/integration/test_api.rs
+#[tokio::test]
+async fn test_fetch_users_endpoint() {
+    let response = client.get("/api/users").send().await.unwrap();
+    assert_eq!(response.status(), 200);
+}
+```
+
+---
+
+## 🔧 C-Specific Standards
+
+### Type Safety & Headers (Required)
+```c
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+/* Use fixed-width integers for cross-platform safety */
+typedef struct {
+    char id[64];
+    char name[128];
+    char email[256];  /* empty string if not set */
+    bool has_email;
+} User;
+
+/**
+ * Fetch users from database.
+ *
+ * @param[out] users   Buffer to write users into.
+ * @param      capacity Maximum number of users to return.
+ * @param[out] count   Actual number of users returned.
+ * @return 0 on success, negative error code on failure.
+ */
+int fetch_users(User *users, size_t capacity, size_t *count);
+```
+
+### Formatting
+- **Standard:** C11 or later (`-std=c11`)
+- **Formatter:** `clang-format` (LLVM or project style)
+- **Warnings:** `-Wall -Wextra -Werror -pedantic`
+- **Naming:** `snake_case` for functions/vars, `PascalCase` for types/structs, `UPPER_SNAKE` for macros/constants
+
+### Error Handling
+```c
+#include <errno.h>
+
+typedef enum {
+    ERR_OK = 0,
+    ERR_INVALID_INPUT = -1,
+    ERR_NOT_FOUND = -2,
+    ERR_DATABASE = -3,
+    ERR_OUT_OF_MEMORY = -4,
+} ErrorCode;
+
+const char *error_string(ErrorCode code);
+
+ErrorCode validate_email(const char *email, char *out, size_t out_size) {
+    if (!email || !strchr(email, '@')) {
+        return ERR_INVALID_INPUT;
+    }
+    /* normalize to lowercase */
+    snprintf(out, out_size, "%s", email);
+    for (char *p = out; *p; ++p) *p = tolower((unsigned char)*p);
+    return ERR_OK;
+}
+```
+
+### Memory Management
+```c
+/* Always pair allocation with cleanup */
+User *user = malloc(sizeof(User));
+if (!user) {
+    return ERR_OUT_OF_MEMORY;
+}
+/* ... use user ... */
+free(user);
+user = NULL;
+
+/* Prefer stack allocation for small, fixed-size objects */
+User stack_user = {0};
+```
+
+### Testing
+```c
+/* Use CUnit, Unity, or CMocka */
+#include <CUnit/CUnit.h>
+#include <CUnit/Basic.h>
+
+void test_user_creation(void) {
+    User user = {0};
+    strncpy(user.id, "123", sizeof(user.id) - 1);
+    strncpy(user.name, "Alice", sizeof(user.name) - 1);
+    CU_ASSERT_STRING_EQUAL(user.id, "123");
+    CU_ASSERT_FALSE(user.has_email);
+}
+
+void test_validate_email_invalid(void) {
+    char out[256];
+    ErrorCode err = validate_email("invalid", out, sizeof(out));
+    CU_ASSERT_EQUAL(err, ERR_INVALID_INPUT);
+}
+```
+
+---
+
+## ⚙️ C++-Specific Standards
+
+### Type Safety & RAII (Required)
+```cpp
+#include <string>
+#include <optional>
+#include <unordered_map>
+#include <vector>
+#include <memory>
+
+struct User {
+    std::string id;
+    std::string name;
+    std::optional<std::string> email;
+    std::unordered_map<std::string, std::string> metadata;
+};
+
+/**
+ * Fetch users from database.
+ *
+ * @param limit Maximum number of users to return.
+ * @return Vector of User objects.
+ * @throws DatabaseError if query fails.
+ */
+std::vector<User> fetch_users(size_t limit = 10);
+
+std::future<std::string> process_async(const User &user);
+```
+
+### Formatting
+- **Standard:** C++17 or later (`-std=c++17`)
+- **Formatter:** `clang-format` (LLVM or project style)
+- **Warnings:** `-Wall -Wextra -Werror -pedantic`
+- **Naming:** `snake_case` for functions/vars, `PascalCase` for classes/structs, `UPPER_SNAKE` for constants
+- **Prefer:** `std::string` over `char*`, `std::vector` over raw arrays, smart pointers over `new`/`delete`
+
+### Error Handling
+```cpp
+#include <stdexcept>
+#include <string>
+
+class ApplicationError : public std::runtime_error {
+public:
+    explicit ApplicationError(const std::string &msg)
+        : std::runtime_error(msg) {}
+};
+
+class ValidationError : public ApplicationError {
+public:
+    explicit ValidationError(const std::string &msg)
+        : ApplicationError(msg) {}
+};
+
+std::string validate_email(const std::string &email) {
+    if (email.empty() || email.find('@') == std::string::npos) {
+        throw ValidationError("Invalid email: " + email);
+    }
+    std::string lower = email;
+    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+    return lower;
+}
+```
+
+### Resource Management (RAII)
+```cpp
+/* Use smart pointers — never raw new/delete in application code */
+auto user = std::make_unique<User>();
+auto shared_user = std::make_shared<User>();
+
+/* Use RAII wrappers for system resources */
+class FileHandle {
+public:
+    explicit FileHandle(const std::string &path)
+        : handle_(fopen(path.c_str(), "r")) {
+        if (!handle_) throw std::runtime_error("Cannot open: " + path);
+    }
+    ~FileHandle() { if (handle_) fclose(handle_); }
+
+    FileHandle(const FileHandle &) = delete;
+    FileHandle &operator=(const FileHandle &) = delete;
+    FileHandle(FileHandle &&other) noexcept : handle_(other.handle_) {
+        other.handle_ = nullptr;
+    }
+private:
+    FILE *handle_;
+};
+```
+
+### Logging
+```cpp
+#include <spdlog/spdlog.h>
+
+void process_user(const std::string &user_id) {
+    spdlog::info("Processing user: {}", user_id);
+    try {
+        auto user = fetch_user(user_id);
+        spdlog::debug("Fetched user: {}", user.name);
+    } catch (const DatabaseError &e) {
+        spdlog::error("Failed to process user {}: {}", user_id, e.what());
+        throw;
+    }
+}
+```
+
+### Testing
+```cpp
+/* Use Google Test or Catch2 */
+#include <gtest/gtest.h>
+
+TEST(UserTest, Creation) {
+    User user{"123", "Alice", std::nullopt, {}};
+    EXPECT_EQ(user.id, "123");
+    EXPECT_FALSE(user.email.has_value());
+}
+
+TEST(ValidationTest, InvalidEmail) {
+    EXPECT_THROW(validate_email("invalid"), ValidationError);
+}
+
+/* Integration test */
+TEST(ApiTest, FetchUsersEndpoint) {
+    auto response = client.get("/api/users");
+    EXPECT_EQ(response.status(), 200);
+    EXPECT_GT(response.json().size(), 0);
+}
+```
+
+---
+
+## 🐹 Go-Specific Standards
+
+### Type System & Interfaces (Required)
+```go
+package models
+
+import (
+    "context"
+    "fmt"
+)
+
+// User represents a system user.
+type User struct {
+    ID       string            `json:"id"`
+    Name     string            `json:"name"`
+    Email    string            `json:"email,omitempty"`
+    Metadata map[string]string `json:"metadata,omitempty"`
+}
+
+// UserService defines operations on users.
+type UserService interface {
+    FetchUsers(ctx context.Context, limit int) ([]User, error)
+    ProcessUser(ctx context.Context, user *User) (string, error)
+}
+```
+
+### Formatting
+- **Formatter:** `gofmt` (non-negotiable, standard Go formatting)
+- **Linting:** `go vet`, `golangci-lint` with default config
+- **Naming:** `camelCase` for unexported, `PascalCase` for exported, acronyms all-caps (`ID`, `HTTP`, `URL`)
+- **Imports:** `goimports` sorted (stdlib, third-party, local)
+
+### Error Handling
+```go
+package errors
+
+import (
+    "errors"
+    "fmt"
+)
+
+var (
+    ErrNotFound      = errors.New("not found")
+    ErrInvalidInput  = errors.New("invalid input")
+)
+
+type ValidationError struct {
+    Field   string
+    Message string
+}
+
+func (e *ValidationError) Error() string {
+    return fmt.Sprintf("validation error on %s: %s", e.Field, e.Message)
+}
+
+func ValidateEmail(email string) (string, error) {
+    if email == "" || !strings.Contains(email, "@") {
+        return "", &ValidationError{
+            Field:   "email",
+            Message: fmt.Sprintf("invalid email: %s", email),
+        }
+    }
+    return strings.ToLower(email), nil
+}
+
+// Always wrap errors with context
+func FetchUser(ctx context.Context, id string) (*User, error) {
+    user, err := db.QueryUser(ctx, id)
+    if err != nil {
+        return nil, fmt.Errorf("fetch user %s: %w", id, err)
+    }
+    return user, nil
+}
+```
+
+### Logging
+```go
+package main
+
+import "log/slog"
+
+func processUser(ctx context.Context, userID string) error {
+    slog.Info("processing user", "user_id", userID)
+
+    user, err := fetchUser(ctx, userID)
+    if err != nil {
+        slog.Error("failed to process user", "user_id", userID, "error", err)
+        return fmt.Errorf("process user %s: %w", userID, err)
+    }
+    slog.Debug("fetched user", "user", user.Name)
+    return nil
+}
+```
+
+### Testing
+```go
+package models_test
+
+import (
+    "testing"
+
+    "github.com/stretchr/testify/assert"
+    "github.com/stretchr/testify/require"
+)
+
+func TestUserCreation(t *testing.T) {
+    user := User{ID: "123", Name: "Alice"}
+    assert.Equal(t, "123", user.ID)
+    assert.Empty(t, user.Email)
+}
+
+func TestValidateEmail_Invalid(t *testing.T) {
+    _, err := ValidateEmail("invalid")
+    require.Error(t, err)
+    var ve *ValidationError
+    assert.ErrorAs(t, err, &ve)
+}
+
+// Integration test
+func TestFetchUsersEndpoint(t *testing.T) {
+    resp, err := http.Get(server.URL + "/api/users")
+    require.NoError(t, err)
+    defer resp.Body.Close()
+    assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+```
+
+---
+
 ## 🏁 Pre-Delivery Checklist (Claude Code)
 
 Before returning code, verify:
 
 - [ ] **All source files complete** — no TODOs, no stubs, no `// TODO: implement X`
-- [ ] **Type hints 100%** — `mypy` or `tsc` passes with no errors
-- [ ] **Tests pass** — `pytest` or `vitest` runs, all pass, ≥80% coverage
-- [ ] **Linting clean** — `ruff`, `eslint` pass, zero warnings
-- [ ] **Setup script works** — `setup.sh` or `npm install && npm test` succeeds on clean system
+- [ ] **Type hints 100%** — `mypy`, `tsc`, `cargo check`, or compiler passes with no errors
+- [ ] **Tests pass** — `pytest`, `vitest`, `go test`, `cargo test`, or `ctest` runs, all pass, ≥80% coverage
+- [ ] **Linting clean** — `ruff`, `eslint`, `clippy`, `clang-tidy`, `go vet` pass, zero warnings
+- [ ] **Setup script works** — `setup.sh`, `npm install && npm test`, `cargo build`, or `cmake && make` succeeds on clean system
 - [ ] **README accurate** — examples run, installation instructions tested
 - [ ] **No secrets in code** — all config in `.env.example`, no API keys/tokens
 - [ ] **Git-ready** — `.gitignore` correct, `git status` shows only new files
@@ -409,6 +882,65 @@ select = ["E", "F", "W", "C90", "I"]
     "eslint": "^8.0"
   }
 }
+```
+
+### Rust
+```toml
+# Cargo.toml
+[package]
+name = "my-project"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+thiserror = "2"
+tracing = "0.1"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[profile.release]
+lto = true
+```
+
+### Go
+```go
+// go.mod
+module github.com/org/my-project
+
+go 1.22
+
+require (
+    github.com/stretchr/testify v1.9.0
+)
+```
+
+### C/C++ (CMake)
+```cmake
+# CMakeLists.txt
+cmake_minimum_required(VERSION 3.20)
+project(my-project VERSION 0.1.0 LANGUAGES C CXX)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_compile_options(-Wall -Wextra -Werror -pedantic)
+
+# Source
+add_library(mylib src/core/logic.c src/models.c)
+add_executable(myapp src/main.c)
+target_link_libraries(myapp PRIVATE mylib)
+
+# Testing
+enable_testing()
+add_executable(test_all tests/test_models.c tests/test_logic.c)
+target_link_libraries(test_all PRIVATE mylib)
+add_test(NAME unit_tests COMMAND test_all)
 ```
 
 ---

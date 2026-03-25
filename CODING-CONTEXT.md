@@ -2,15 +2,19 @@
 
 ## Tech Stack
 
-- **Languages:** Python, TypeScript, Bash, Go (primary)
-- **Build:** uv, npm, cargo
-- **Testing:** pytest, vitest, go test
-- **Linting:** ruff, eslint, gofmt
+- **Languages:** Python, TypeScript, Bash, Go, C, C++, Rust (primary)
+- **Build:** uv, npm, cargo, cmake, make, go build
+- **Testing:** pytest, vitest, go test, ctest, cargo test, check/CUnit
+- **Linting:** ruff, eslint, gofmt, clang-tidy, clippy, cppcheck
 
 ## Coding Standards
 
 - **Python:** Type hints required, Black formatting, 120 char lines
 - **TypeScript:** Strict mode, 4-space indent, ESLint strict
+- **Go:** `gofmt` formatting, exported functions documented, error wrapping with `fmt.Errorf("...: %w", err)`
+- **Rust:** `rustfmt` formatting, `clippy` clean, no `unsafe` without justification, `Result<T, E>` for fallible ops
+- **C:** C11 or later, `-Wall -Wextra -Werror`, no undefined behavior, `clang-format` formatting
+- **C++:** C++17 or later, RAII for resource management, `-Wall -Wextra -Werror`, smart pointers over raw pointers
 - **Bash:** ShellCheck passing, set -euo pipefail
 - **Error handling:** Explicit, no silent failures
 
@@ -47,9 +51,15 @@ workspace/
 |------|---------|
 | Run Python | `python3 script.py` or `.venv/bin/python` |
 | Node project | `npm run dev` or `npm test` |
-| Rust/Go | `cargo run` or `go run ./...` |
+| Go | `go run ./...` or `go test ./... -v -cover` |
+| Rust | `cargo run` or `cargo test` |
+| C/C++ build | `mkdir build && cd build && cmake .. && make` |
+| C/C++ test | `cd build && ctest --output-on-failure` |
 | Type check | `pyright` or `tsc --noEmit` |
-| Lint | `ruff check .` or `eslint .` |
+| Lint (Python/TS) | `ruff check .` or `eslint .` |
+| Lint (Go) | `go vet ./...` and `golangci-lint run` |
+| Lint (Rust) | `cargo clippy -- -D warnings` |
+| Lint (C/C++) | `clang-tidy src/*.c` or `cppcheck --enable=all src/` |
 
 ## Visual Validation (ALL GUI/Web Projects — MANDATORY)
 

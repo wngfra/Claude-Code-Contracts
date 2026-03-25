@@ -413,7 +413,7 @@ If you have project-specific rules, add them to `CODING-CONTEXT.md`:
 
 ### For Different Languages
 
-The contract works for Python, TypeScript, Go, Rust. Adjust:
+The contract works for Python, TypeScript, Go, Rust, C, and C++. Adjust:
 1. `CODING-CONTEXT.md` — language-specific rules
 2. `PROMPT-CLAUDE-CODE-MASTER.md` — examples in that language
 

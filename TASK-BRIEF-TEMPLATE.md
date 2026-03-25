@@ -7,8 +7,8 @@
 ## Project
 
 **Name:** [Project Name]
-**Language:** [Python / TypeScript / Go / Other]
-**Framework:** [FastAPI / Express / Flask / None / Other]
+**Language:** [Python / TypeScript / Go / Rust / C / C++ / Other]
+**Framework:** [FastAPI / Express / Flask / Actix-web / Axum / Gin / None / Other]
 **Duration Estimate:** [2h / 4h / 8h / Full day]
 
 ---
@@ -65,7 +65,7 @@ Example:
 
 - **Budget:** [Cost limit for API calls, compute, etc.]
 - **Dependencies:** [No external services / Use only stdlib / Must use X library]
-- **Compatibility:** [Python 3.10+, Node 18+, etc.]
+- **Compatibility:** [Python 3.10+, Node 18+, Rust 1.75+, Go 1.22+, C11/C17, C++17/C++20, etc.]
 - **Deployment:** [Local CLI / Docker / Serverless / API server]
 
 Example:
