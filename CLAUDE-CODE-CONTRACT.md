@@ -11,17 +11,18 @@
 3. **Tests are not optional.** Every deliverable includes unit tests + integration tests, minimum 80% coverage.
 4. **Documentation lives in code.** Docstrings, type hints, and inline comments explain *why*, not *what*.
 5. **No placeholder code.** Every function, every class, every module is production-grade or removed.
-6. **Right tool for the job.** Use the task mode that matches your intent — generate, refactor, debug, or rewrite.
+6. **Right tool for the job.** Use the task mode that matches your intent — generate, add function, refactor, debug, or rewrite.
 
 ---
 
 ## 🔀 Task Modes
 
-This contract supports four modes. Each mode uses a dedicated prompt from `prompts/` and has its own checklist. **Pick the mode that matches what you're doing.**
+This contract supports five modes. Each mode uses a dedicated prompt from `prompts/` and has its own checklist. **Pick the mode that matches what you're doing.**
 
 | Mode | When to Use | Prompt File | Key Constraint |
 |---|---|---|---|
 | **Generate** | Build a new project from scratch | `PROMPT-CLAUDE-CODE-MASTER.md` | Ship complete, no TODOs |
+| **Add Function** | Add new functionality to existing code | `PROMPT-ADD-FUNCTION.md` | Existing tests still pass, follows conventions |
 | **Refactor** | Restructure without changing behavior | `PROMPT-REFACTOR.md` | Existing tests pass unchanged |
 | **Debug** | Find and fix a specific bug | `PROMPT-DEBUG.md` | Failing test first, minimal fix |
 | **Partial Rewrite** | Replace a module with new implementation | `PROMPT-PARTIAL-REWRITE.md` | Callers don't break |
@@ -30,6 +31,7 @@ This contract supports four modes. Each mode uses a dedicated prompt from `promp
 
 ```
 "I need to build something new"              → Generate
+"I need to add a feature to existing code"   → Add Function
 "This code works but is messy"               → Refactor
 "This code is broken"                        → Debug
 "This module needs a fundamentally new design" → Partial Rewrite
@@ -787,6 +789,15 @@ Before returning code in **any** mode, verify:
 - [ ] **Error messages clear** — users understand what went wrong and how to fix it
 - [ ] **Naming consistent** — no `temp_var`, no `x`, no `do_thing_2()`
 
+### Add Function Mode — Additional Checklist
+
+- [ ] **New code follows conventions** — naming, error handling, logging match existing codebase
+- [ ] **All existing tests pass unchanged** — zero regressions introduced
+- [ ] **New tests written** — unit + integration for all new functionality, >=80% coverage on new code
+- [ ] **FEATURE-PLAN documented** — what was added, where it fits, interface contracts
+- [ ] **Documentation updated** — docstrings, README (if user-facing), `.env.example` (if new config)
+- [ ] **No scope creep** — only the requested feature was added, no unrelated changes
+
 ### Generate Mode — Additional Checklist
 
 - [ ] **All source files complete** — no TODOs, no stubs, no `// TODO: implement X`
@@ -1139,6 +1150,21 @@ add_test(NAME unit_tests COMMAND test_all)
 
 When code is ready, format the summary based on task mode:
 
+### Add Function Mode
+```
+✅ FEATURE ADDED
+├── Feature:           [name and description]
+├── New files:         [list]
+├── Modified files:    [list]
+├── New functions:     [signatures]
+├── Tests:             [N] new, all [N] existing pass
+├── Coverage:          [coverage]% on new code
+├── Docs:              Updated
+└── Config:            [new env vars, or "none"]
+
+Ready to: git add . && git commit -m "feat: add [feature description]"
+```
+
 ### Generate Mode
 ```
 ✅ DELIVERABLES
@@ -1208,6 +1234,9 @@ If output doesn't meet this standard:
 5. **Escalate if needed** — Use Sonnet for architectural review
 
 ### Mode-Specific Rejection Examples
+
+**Add Function rejected:**
+> "The new `export_data()` function uses print statements for logging, but the rest of the codebase uses structured logging with `slog`. Rewrite to follow existing conventions."
 
 **Refactor rejected:**
 > "Existing test `test_validate_email` fails after your refactoring. The refactor changed behavior — `validate_email()` now returns lowercase but the test expects original case. Revert the behavior change and only restructure."

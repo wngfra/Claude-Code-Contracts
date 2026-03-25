@@ -1,6 +1,7 @@
 # PROMPT: Claude Code — Master Generator (Generate Mode)
 
 **Use this prompt when building a new project from scratch. For other task types, use the dedicated prompts:**
+- **Adding functionality to existing code →** `PROMPT-ADD-FUNCTION.md`
 - **Refactoring existing code →** `PROMPT-REFACTOR.md`
 - **Fixing a bug →** `PROMPT-DEBUG.md`
 - **Replacing a module →** `PROMPT-PARTIAL-REWRITE.md`
@@ -204,7 +205,7 @@ When the task involves non-trivial design decisions, unfamiliar domains, or algo
 - `THINKING-FRAMEWORKS.md` — Problem decomposition & algorithm design (for complex tasks)
 - This prompt (`PROMPT-CLAUDE-CODE-MASTER.md`) — Generate mode instructions
 
-> **Important:** If the TASK-BRIEF specifies a task type other than "Generate", stop and tell the user to use the matching prompt instead (`PROMPT-REFACTOR.md`, `PROMPT-DEBUG.md`, or `PROMPT-PARTIAL-REWRITE.md`). Each mode has different constraints and checklists.
+> **Important:** If the TASK-BRIEF specifies a task type other than "Generate", stop and tell the user to use the matching prompt instead (`PROMPT-ADD-FUNCTION.md`, `PROMPT-REFACTOR.md`, `PROMPT-DEBUG.md`, or `PROMPT-PARTIAL-REWRITE.md`). Each mode has different constraints and checklists.
 
 ---
 
