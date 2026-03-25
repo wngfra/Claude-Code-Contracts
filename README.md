@@ -43,28 +43,21 @@ How you do this depends on your interface:
 
 #### Claude Code CLI (recommended)
 
-Start Claude Code in your project directory. Use `/add` to load the contract files, then type your request:
+Start Claude Code in your project directory and reference the contract files with `@` in your prompt:
 
 ```bash
 cd ~/my-project
-
-# Start Claude Code
 claude
 
-# Inside the session, add contract files:
-> /add /path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md
-> /add /path/to/claude-code-contracts/CODING-CONTEXT.md
-> /add /path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md
-> /add TASK-BRIEF.md
-
-# Then type your prompt:
-> Generate production code following CLAUDE-CODE-CONTRACT.md and TASK-BRIEF.md
+# Inside the session, reference files with @ and type your prompt:
+> Read @/path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md @/path/to/claude-code-contracts/CODING-CONTEXT.md @/path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md and @TASK-BRIEF.md then generate production code following the contract and task brief.
 ```
 
-Alternatively, pass everything in one command:
+Or pipe everything in non-interactive mode:
 
 ```bash
-cat CLAUDE-CODE-CONTRACT.md CODING-CONTEXT.md prompts/PROMPT-CLAUDE-CODE-MASTER.md TASK-BRIEF.md | claude --print "Generate production code following the attached contract and task brief."
+cat CLAUDE-CODE-CONTRACT.md CODING-CONTEXT.md prompts/PROMPT-CLAUDE-CODE-MASTER.md TASK-BRIEF.md \
+  | claude -p "Generate production code following the attached contract and task brief."
 ```
 
 #### Claude.ai (web)

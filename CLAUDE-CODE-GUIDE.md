@@ -85,26 +85,21 @@ Choose the method that matches how you use Claude:
 
 ### Claude Code CLI
 
-Start `claude` in your project directory, load the contracts with `/add`, then type your request:
+Start `claude` in your project directory and reference contract files with `@` in your prompt:
 
 ```bash
 cd ~/my-project
 claude
 
-# Inside the CLI session:
-> /add /path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md
-> /add /path/to/claude-code-contracts/CODING-CONTEXT.md
-> /add /path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md
-> /add TASK-BRIEF.md
-
-> Generate production code following CLAUDE-CODE-CONTRACT.md and TASK-BRIEF.md
+# Reference files with @ and type your prompt:
+> Read @/path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md @/path/to/claude-code-contracts/CODING-CONTEXT.md @/path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md and @TASK-BRIEF.md then generate production code following the contract and task brief.
 ```
 
-Or pipe everything in one shot:
+Or pipe everything in non-interactive mode:
 
 ```bash
 cat CLAUDE-CODE-CONTRACT.md CODING-CONTEXT.md prompts/PROMPT-CLAUDE-CODE-MASTER.md TASK-BRIEF.md \
-  | claude --print "Generate production code following the attached contract and task brief."
+  | claude -p "Generate production code following the attached contract and task brief."
 ```
 
 ### Claude.ai (web)
@@ -206,11 +201,7 @@ cp /path/to/claude-code-contracts/TASK-BRIEF-TEMPLATE.md TASK-BRIEF.md
 ```bash
 claude
 
-> /add /path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md
-> /add /path/to/claude-code-contracts/CODING-CONTEXT.md
-> /add /path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md
-> /add TASK-BRIEF.md
-> Generate a production-grade weather API per the contract and task brief.
+> Read @/path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md @/path/to/claude-code-contracts/CODING-CONTEXT.md @/path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md and @TASK-BRIEF.md then generate a production-grade weather API per the contract and task brief.
 ```
 
 ### 3. Verify

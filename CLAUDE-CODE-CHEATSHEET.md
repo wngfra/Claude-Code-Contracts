@@ -44,21 +44,15 @@ That's it. Claude Code handles the rest.
 cd ~/my-project
 claude
 
-# Inside the session, load contract files:
-> /add /path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md
-> /add /path/to/claude-code-contracts/CODING-CONTEXT.md
-> /add /path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md
-> /add TASK-BRIEF.md
-
-# Then type your prompt:
-> Generate production code following CLAUDE-CODE-CONTRACT.md and TASK-BRIEF.md
+# Reference files with @ and type your prompt:
+> Read @/path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md @/path/to/claude-code-contracts/CODING-CONTEXT.md @/path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md and @TASK-BRIEF.md then generate production code following the contract and task brief.
 ```
 
 ### One-shot (pipe mode)
 
 ```bash
 cat CLAUDE-CODE-CONTRACT.md CODING-CONTEXT.md prompts/PROMPT-CLAUDE-CODE-MASTER.md TASK-BRIEF.md \
-  | claude --print "Generate production code following the attached contract and task brief."
+  | claude -p "Generate production code following the attached contract and task brief."
 ```
 
 ### Claude.ai (web)
