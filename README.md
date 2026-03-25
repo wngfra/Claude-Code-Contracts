@@ -43,22 +43,16 @@ How you do this depends on your interface:
 
 #### Claude Code CLI (recommended)
 
-Start Claude Code in your project directory. Use `/add` to load the contract files, then type your request:
+Start Claude Code in your project directory. Reference the contract files with `@` to load them into context, then type your request:
 
 ```bash
 cd ~/my-project
 
-# Start Claude Code
-claude
+# Start Claude Code (use --add-dir to include the contracts directory)
+claude --add-dir /path/to/claude-code-contracts
 
-# Inside the session, add contract files:
-> /add /path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md
-> /add /path/to/claude-code-contracts/CODING-CONTEXT.md
-> /add /path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md
-> /add TASK-BRIEF.md
-
-# Then type your prompt:
-> Generate production code following CLAUDE-CODE-CONTRACT.md and TASK-BRIEF.md
+# Inside the session, reference contract files with @ and type your prompt:
+> @/path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md @/path/to/claude-code-contracts/CODING-CONTEXT.md @/path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md @TASK-BRIEF.md Generate production code following the contract and task brief.
 ```
 
 Alternatively, pass everything in one command:

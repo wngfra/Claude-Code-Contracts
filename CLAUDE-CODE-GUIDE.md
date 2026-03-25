@@ -85,19 +85,14 @@ Choose the method that matches how you use Claude:
 
 ### Claude Code CLI
 
-Start `claude` in your project directory, load the contracts with `/add`, then type your request:
+Start `claude` in your project directory, reference the contracts with `@` to load them into context, then type your request:
 
 ```bash
 cd ~/my-project
-claude
+claude --add-dir /path/to/claude-code-contracts
 
-# Inside the CLI session:
-> /add /path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md
-> /add /path/to/claude-code-contracts/CODING-CONTEXT.md
-> /add /path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md
-> /add TASK-BRIEF.md
-
-> Generate production code following CLAUDE-CODE-CONTRACT.md and TASK-BRIEF.md
+# Inside the CLI session, reference files with @ and type your prompt:
+> @/path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md @/path/to/claude-code-contracts/CODING-CONTEXT.md @/path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md @TASK-BRIEF.md Generate production code following the contract and task brief.
 ```
 
 Or pipe everything in one shot:
@@ -204,13 +199,9 @@ cp /path/to/claude-code-contracts/TASK-BRIEF-TEMPLATE.md TASK-BRIEF.md
 ### 2. Start Claude Code
 
 ```bash
-claude
+claude --add-dir /path/to/claude-code-contracts
 
-> /add /path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md
-> /add /path/to/claude-code-contracts/CODING-CONTEXT.md
-> /add /path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md
-> /add TASK-BRIEF.md
-> Generate a production-grade weather API per the contract and task brief.
+> @/path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md @/path/to/claude-code-contracts/CODING-CONTEXT.md @/path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md @TASK-BRIEF.md Generate a production-grade weather API per the contract and task brief.
 ```
 
 ### 3. Verify
