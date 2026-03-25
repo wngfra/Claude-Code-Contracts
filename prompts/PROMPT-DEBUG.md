@@ -36,7 +36,7 @@ Reference: `CLAUDE-CODE-CONTRACT.md` — follow every requirement without except
 ### What Debugging IS NOT
 
 - Refactoring surrounding code (that's a refactor task)
-- Adding new features (that's a feature task)
+- Adding new features (that's an add-function task)
 - Rewriting the module (that's a partial-rewrite task)
 - "Improving" code you happened to read while debugging
 

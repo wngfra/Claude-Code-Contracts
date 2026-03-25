@@ -20,6 +20,7 @@ Complete walkthrough for generating production-grade code with Claude using the 
 | Prompt | When to Use |
 |---|---|
 | **prompts/PROMPT-CLAUDE-CODE-MASTER.md** | Building a new project from scratch |
+| **prompts/PROMPT-ADD-FUNCTION.md** | Adding new functionality to an existing codebase |
 | **prompts/PROMPT-REFACTOR.md** | Restructuring existing code without changing behavior |
 | **prompts/PROMPT-DEBUG.md** | Finding and fixing a specific bug |
 | **prompts/PROMPT-PARTIAL-REWRITE.md** | Replacing a module with a new implementation |
@@ -27,7 +28,7 @@ Complete walkthrough for generating production-grade code with Claude using the 
 ### The Flow
 
 ```
-1. Pick your task type (generate / refactor / debug / rewrite)
+1. Pick your task type (generate / add function / refactor / debug / rewrite)
         ↓
 2. Fill TASK-BRIEF.md (your requirements + task-type-specific sections)
         ↓
@@ -88,6 +89,41 @@ Build a system that reads GitHub issues, uses Claude AI to categorize them
 - [ ] Setup works: `setup.sh && make test` first try
 - [ ] README has working examples
 - [ ] Type hints: 100% on public APIs
+```
+
+### Example: Add Function — User Preferences Endpoint
+
+```markdown
+# TASK-BRIEF: Add user preferences endpoint
+
+**Task Type:** Add Function
+
+## Project
+Language: Python
+Framework: FastAPI
+Existing project: ~/github-issue-triage
+
+## Problem Statement
+Add a POST /api/users/{id}/preferences endpoint that lets users
+configure their display theme, notification settings, and language.
+Should store preferences in the existing SQLite database.
+
+## Feature Scope
+**What's being added:** UserPreferences model + CRUD endpoint + storage
+**Where it fits:** Extend src/api/handlers.py, src/models.py, src/database/store.py
+**New files:** src/core/preferences.py, tests/unit/test_preferences.py
+
+## Requirements
+- [ ] POST /api/users/{id}/preferences — set preferences
+- [ ] GET /api/users/{id}/preferences — get preferences
+- [ ] Default preferences for new users (theme=light, notifications=true, lang=en)
+
+## Success Criteria
+- [ ] New endpoints work and return correct responses
+- [ ] All existing tests pass unchanged
+- [ ] New tests cover preferences logic (>=80%)
+- [ ] Follows existing code patterns (Pydantic models, custom exceptions)
+- [ ] FEATURE-PLAN included
 ```
 
 ### Example: Refactor — Clean Up Auth Module
@@ -187,6 +223,7 @@ Choose the method that matches how you use Claude. **Always use the prompt that 
 | Task Type | Prompt File |
 |---|---|
 | Generate | `prompts/PROMPT-CLAUDE-CODE-MASTER.md` |
+| Add Function | `prompts/PROMPT-ADD-FUNCTION.md` |
 | Refactor | `prompts/PROMPT-REFACTOR.md` |
 | Debug | `prompts/PROMPT-DEBUG.md` |
 | Partial Rewrite | `prompts/PROMPT-PARTIAL-REWRITE.md` |
@@ -202,6 +239,10 @@ claude --add-dir /path/to/claude-code-contracts
 # Generate
 > @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-CLAUDE-CODE-MASTER.md @TASK-BRIEF.md
   Generate production code following the contract and task brief.
+
+# Add Function
+> @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-ADD-FUNCTION.md @TASK-BRIEF.md
+  Add the new functionality following the contract and task brief.
 
 # Refactor
 > @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-REFACTOR.md @TASK-BRIEF.md
@@ -270,6 +311,14 @@ What Claude delivers depends on the task mode:
 - Configuration (`.env.example`)
 - Build tools (Makefile, setup script)
 - Git ready (`.gitignore`, first commit)
+
+### Add Function Mode
+- New functionality integrated into existing codebase
+- New code follows existing conventions
+- FEATURE-PLAN documenting what was added and where
+- New tests for all added functionality (>=80% coverage)
+- All existing tests passing unchanged
+- Updated documentation (README, docstrings, `.env.example`)
 
 ### Refactor Mode
 - Modified source files (restructured, renamed, extracted)
@@ -402,7 +451,9 @@ A common mistake is using the wrong mode:
 
 | Symptom | Wrong Mode | Right Mode |
 |---|---|---|
+| "I need to add an endpoint to my API" | Generate (overkill) | Add Function (extend existing) |
 | "I refactored but tests broke" | Refactor (behavior changed) | Partial Rewrite (new design) |
+| "My new feature needs the code cleaned up first" | Add Function (mixed concerns) | Refactor first, then Add Function |
 | "My bug fix turned into a rewrite" | Debug (scope crept) | Debug first, then Refactor |
 | "I need to fix a bug AND clean up" | Trying both at once | Debug first, then Refactor (two tasks) |
 | "The whole thing needs a redo" | Partial Rewrite | Generate (start fresh) |
@@ -421,7 +472,7 @@ Not every session needs every file. Use the minimum context for your task:
 |---|---|---|
 | Quick generate (small project) | CONTRACT + PROMPT + BRIEF | GUIDE, CHEATSHEET, THINKING-FRAMEWORKS |
 | Complex generate (novel domain) | CONTRACT + PROMPT + BRIEF + THINKING-FRAMEWORKS | GUIDE, CHEATSHEET |
-| Refactor / Debug / Rewrite | CONTRACT + matching PROMPT + BRIEF | CHEATSHEET, THINKING-FRAMEWORKS |
+| Add Function / Refactor / Debug / Rewrite | CONTRACT + matching PROMPT + BRIEF | CHEATSHEET, THINKING-FRAMEWORKS |
 | Reference lookup | CHEATSHEET only | Everything else |
 
 ### Split Large Projects
@@ -457,7 +508,7 @@ This contract exists because "I'll iterate later" projects never do. Build right
 
 ### One Task, One Mode
 
-Don't mix modes in a single session. Fix the bug first (Debug mode), then clean up the code (Refactor mode), then replace the module if needed (Partial Rewrite mode). Each gets its own TASK-BRIEF and prompt.
+Don't mix modes in a single session. Fix the bug first (Debug mode), then clean up the code (Refactor mode), then add the new feature (Add Function mode), then replace the module if needed (Partial Rewrite mode). Each gets its own TASK-BRIEF and prompt.
 
 ### Scale the Brief, Not the Standards
 

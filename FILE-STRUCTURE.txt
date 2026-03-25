@@ -98,6 +98,14 @@ Location: /Users/alex/.openclaw/workspace/claude-code-contracts/
     │  ├─ Success Criteria
     │  └─ Final Handoff Format
     │
+    ├─ PROMPT-ADD-FUNCTION.md ⭐ ADD FUNCTION MODE
+    │  └─ Prompt for adding new functionality to existing code
+    │  ├─ Add Function Principles (golden rule: integrates cleanly, tests still pass)
+    │  ├─ Integration Plan Requirements
+    │  ├─ Convention Matching Rules
+    │  ├─ Integration Patterns (endpoint, CLI, utility, interface)
+    │  └─ Pre-Delivery Checklist
+    │
     ├─ PROMPT-REFACTOR.md ⭐ REFACTOR MODE
     │  └─ Prompt for restructuring existing code
     │  ├─ Refactoring Principles (golden rule: tests pass unchanged)
@@ -136,6 +144,7 @@ When spawning a Claude Code session, attach:
   3. TASK-BRIEF.md                          (your task — copy from template)
   4. The matching prompt for your task type:
      • Generate:        prompts/PROMPT-CLAUDE-CODE-MASTER.md
+     • Add Function:    prompts/PROMPT-ADD-FUNCTION.md
      • Refactor:        prompts/PROMPT-REFACTOR.md
      • Debug:           prompts/PROMPT-DEBUG.md
      • Partial Rewrite: prompts/PROMPT-PARTIAL-REWRITE.md
@@ -187,7 +196,7 @@ Every Claude Code project must deliver:
 🚀 HOW IT WORKS
 
 1. Pick task type
-   (generate / refactor / debug / partial rewrite)
+   (generate / add function / refactor / debug / partial rewrite)
 
 2. Fill TASK-BRIEF.md
    (task type, requirements, mode-specific sections)

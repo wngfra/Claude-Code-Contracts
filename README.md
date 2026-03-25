@@ -1,6 +1,6 @@
 # Claude Code Production Contracts
 
-A contract system that ensures Claude produces production-grade code: fully typed, tested, documented, and ready to ship. Supports **four task modes** — generating new projects, refactoring, debugging, and partial rewrites.
+A contract system that ensures Claude produces production-grade code: fully typed, tested, documented, and ready to ship. Supports **five task modes** — generating new projects, adding functions to existing code, refactoring, debugging, and partial rewrites.
 
 Works with the **Claude Code CLI**, **claude.ai web**, or the **Claude API**. No other tools required.
 
@@ -19,6 +19,7 @@ claude-code-contracts/
 ├── CODING-CONTEXT.md                      ← language-specific rules & algorithmic guidance
 └── prompts/
     ├── PROMPT-CLAUDE-CODE-MASTER.md       ← Generate mode (new projects)
+    ├── PROMPT-ADD-FUNCTION.md             ← Add Function mode (extend existing code)
     ├── PROMPT-REFACTOR.md                 ← Refactor mode (restructure existing code)
     ├── PROMPT-DEBUG.md                    ← Debug mode (find and fix bugs)
     └── PROMPT-PARTIAL-REWRITE.md          ← Partial Rewrite mode (replace a module)
@@ -33,6 +34,7 @@ Each prompt is a **system prompt** — instructions that tell Claude *how* to ap
 | Task | Prompt to Attach |
 |---|---|
 | Build something new | `prompts/PROMPT-CLAUDE-CODE-MASTER.md` |
+| Add feature to existing code | `prompts/PROMPT-ADD-FUNCTION.md` |
 | Restructure existing code | `prompts/PROMPT-REFACTOR.md` |
 | Fix a specific bug | `prompts/PROMPT-DEBUG.md` |
 | Replace a module/component | `prompts/PROMPT-PARTIAL-REWRITE.md` |
@@ -59,6 +61,10 @@ claude --add-dir /path/to/claude-code-contracts
 # Generate (new project)
 > @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-CLAUDE-CODE-MASTER.md @TASK-BRIEF.md
   Generate production code following the contract and task brief.
+
+# Add Function (extend existing code)
+> @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-ADD-FUNCTION.md @TASK-BRIEF.md
+  Add the new functionality following the contract and task brief.
 
 # Refactor
 > @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-REFACTOR.md @TASK-BRIEF.md
@@ -141,6 +147,7 @@ Python, TypeScript, Go, Rust, C, and C++. Language-specific rules live in `CODIN
 
 ### Mode-Specific Rejections
 
+**Add Function:** "New code doesn't follow existing conventions — uses print() instead of structured logging."
 **Refactor:** "Existing tests broke — you changed behavior, not just structure."
 **Debug:** "Fix is too broad — you refactored 50 lines but only 1 line was the bug."
 **Partial Rewrite:** "Callers are broken — provide a migration guide or preserve the old API."
@@ -167,7 +174,7 @@ Not every session needs all files. Attach only what your task requires:
 |---|---|---|
 | Quick generate | CONTRACT + PROMPT + BRIEF | GUIDE, CHEATSHEET, THINKING-FRAMEWORKS |
 | Complex/novel generate | CONTRACT + PROMPT + BRIEF + THINKING-FRAMEWORKS | GUIDE, CHEATSHEET |
-| Refactor / Debug / Rewrite | CONTRACT + matching PROMPT + BRIEF | CHEATSHEET, THINKING-FRAMEWORKS |
+| Add Function / Refactor / Debug / Rewrite | CONTRACT + matching PROMPT + BRIEF | CHEATSHEET, THINKING-FRAMEWORKS |
 
 For large projects, split across sessions: core types → API layer → test suite. See GUIDE §Token Efficiency.
 
@@ -177,7 +184,7 @@ For large projects, split across sessions: core types → API layer → test sui
 
 | File | When to read |
 |---|---|
-| `CLAUDE-CODE-GUIDE.md` | First time — full walkthrough with examples for all 4 modes |
+| `CLAUDE-CODE-GUIDE.md` | First time — full walkthrough with examples for all 5 modes |
 | `CLAUDE-CODE-CHEATSHEET.md` | During a project — quick reference & copy-paste templates |
 | `CLAUDE-CODE-CONTRACT.md` | When reviewing output against standards |
 | `THINKING-FRAMEWORKS.md` | Complex tasks — problem decomposition, algorithms, novel domains |

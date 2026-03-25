@@ -37,7 +37,7 @@ Reference: `CLAUDE-CODE-CONTRACT.md` — follow every requirement without except
 
 ### What Refactoring IS NOT
 
-- Adding new features (that's a feature task)
+- Adding new features (that's an add-function task)
 - Fixing bugs (that's a debug task)
 - Rewriting from scratch (that's a partial-rewrite task)
 - Changing external APIs or behavior

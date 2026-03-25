@@ -14,6 +14,7 @@ TASK-BRIEF (with task type) + CONTRACT + matching PROMPT
 | Task Type | Prompt to Attach |
 |---|---|
 | **Generate** (new project) | `prompts/PROMPT-CLAUDE-CODE-MASTER.md` |
+| **Add Function** (extend existing code) | `prompts/PROMPT-ADD-FUNCTION.md` |
 | **Refactor** (restructure) | `prompts/PROMPT-REFACTOR.md` |
 | **Debug** (fix bug) | `prompts/PROMPT-DEBUG.md` |
 | **Partial Rewrite** (replace module) | `prompts/PROMPT-PARTIAL-REWRITE.md` |
@@ -39,6 +40,31 @@ TASK-BRIEF (with task type) + CONTRACT + matching PROMPT
 
 **Success:** Tests pass (≥80%), setup works first try, README has examples
 **Constraints:** [Any limits or dependencies]
+```
+
+### Add Function (Extend Existing Code)
+
+```markdown
+# TASK-BRIEF: Add [feature] to [project]
+
+**Task Type:** Add Function
+**Language:** Python / TypeScript / Go / Rust / C / C++
+**Existing project:** [repo path or URL]
+
+**What to add:** [1 sentence describing the new functionality]
+**Where it fits:** [which existing files/modules to extend]
+
+**Must have:**
+- [ ] Feature A
+- [ ] Feature B
+- [ ] Feature C
+
+**Constraints:**
+- Must follow existing code conventions
+- All existing tests must pass
+- New code needs tests (>=80% coverage)
+
+**Success:** New functionality works, existing tests pass, new tests pass, docs updated
 ```
 
 ### Refactor (Existing Code)
@@ -121,6 +147,10 @@ Then reference the **right prompt for your task type:**
 # Generate (new project)
 > @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-CLAUDE-CODE-MASTER.md @TASK-BRIEF.md
   Generate production code following the contract and task brief.
+
+# Add Function (extend existing code)
+> @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-ADD-FUNCTION.md @TASK-BRIEF.md
+  Add the new functionality following the contract and task brief.
 
 # Refactor (restructure existing code)
 > @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-REFACTOR.md @TASK-BRIEF.md
@@ -222,6 +252,14 @@ Don't accept broken code. Request specific fix:
 ❌ "The code has bugs"
 ✅ "The fetch_user() function is missing error handling for DatabaseError.
     Regenerate src/api.py with explicit try/except for all database calls."
+```
+
+### Add Function Mode
+```
+❌ "The new feature doesn't work right"
+✅ "The new export_data() function uses print() for logging, but the rest of
+    the codebase uses structured logging with slog. Rewrite to follow existing
+    conventions. Also missing unit tests for the error path."
 ```
 
 ### Refactor Mode
@@ -588,7 +626,7 @@ Not every session needs all files. Choose the minimum context:
 |---|---|---|
 | **Quick generate** (small project) | CONTRACT + matching PROMPT + BRIEF | GUIDE, CHEATSHEET, THINKING-FRAMEWORKS |
 | **Complex generate** (novel domain) | CONTRACT + PROMPT + BRIEF + THINKING-FRAMEWORKS | GUIDE, CHEATSHEET |
-| **Refactor / Debug** | CONTRACT + matching PROMPT + BRIEF | CHEATSHEET, THINKING-FRAMEWORKS, CODING-CONTEXT |
+| **Add Function / Refactor / Debug** | CONTRACT + matching PROMPT + BRIEF | CHEATSHEET, THINKING-FRAMEWORKS, CODING-CONTEXT |
 | **Reference lookup** | CHEATSHEET only | Everything else |
 
 ### Reduce Prompt Size

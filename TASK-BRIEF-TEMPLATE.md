@@ -9,11 +9,12 @@
 **Pick one:**
 
 - [ ] **Generate** — Build a new project from scratch
+- [ ] **Add Function** — Add new functionality to an existing codebase
 - [ ] **Refactor** — Restructure existing code without changing behavior
 - [ ] **Debug** — Find and fix a specific bug
 - [ ] **Partial Rewrite** — Replace a module/component with a new implementation
 
-> **Why this matters:** Each mode uses a different prompt and checklist. Generate mode produces a full project. The other three modes work on existing code and have stricter scope controls. Pick the right mode, attach the matching prompt from `prompts/`.
+> **Why this matters:** Each mode uses a different prompt and checklist. Generate mode produces a full project. The other four modes work on existing code and have stricter scope controls. Pick the right mode, attach the matching prompt from `prompts/`.
 
 ---
 
@@ -34,6 +35,9 @@
 
 Example (Generate):
 > We're building a GitHub issue triage system that uses Claude AI to automatically categorize issues, extract key details, and suggest labels. Users run it via CLI or API.
+
+Example (Add Function):
+> We need to add a `POST /api/users/{id}/preferences` endpoint that allows users to update their display theme, notification settings, and language. Should integrate with the existing user service and follow current API patterns.
 
 Example (Refactor):
 > The `src/auth/` module has grown to 1200 lines with deep nesting and duplicated validation logic. Restructure into focused sub-modules (tokens, passwords, sessions) without changing the public API.
@@ -109,7 +113,7 @@ POST /api/endpoint
 
 ---
 
-## Existing Code Context (For Refactor / Debug / Partial Rewrite)
+## Existing Code Context (For Add Function / Refactor / Debug / Partial Rewrite)
 
 > **Skip this section for Generate tasks.** For all other task types, this is essential.
 
@@ -141,6 +145,34 @@ make test                    # or: npm test, cargo test, go test ./...
 # Paste the specific function, class, or module that needs work.
 # Include enough context for Claude to understand the surrounding code.
 ```
+
+---
+
+## Feature Scope (For Add Function Tasks Only)
+
+> **Skip this section unless task type is Add Function.**
+
+### What's Being Added
+[Name the new functions, endpoints, classes, or modules]
+
+### Where It Fits
+[Which existing files/modules will be modified or extended]
+
+### New Files Needed
+[Any new files to create — or "none, extending existing files"]
+
+### Interface Contract
+```
+# Function signatures, endpoint definitions, or class interfaces
+# Example:
+# POST /api/users/{id}/preferences → UserPreferences
+# def export_data(format: str, output: Path) -> ExportResult
+```
+
+### Dependencies
+- [ ] New libraries: [list, or "none"]
+- [ ] New services: [list, or "none"]
+- [ ] New configuration: [env vars, or "none"]
 
 ---
 
@@ -208,6 +240,14 @@ make test                    # or: npm test, cargo test, go test ./...
 - [ ] Error handling is explicit (no silent failures)
 - [ ] Code is readable and well-documented
 
+### Add Function Only
+- [ ] New functionality works as specified
+- [ ] All existing tests pass unchanged
+- [ ] New tests cover all new code (>=80% coverage)
+- [ ] New code follows existing codebase conventions
+- [ ] Documentation updated (docstrings, README, `.env.example`)
+- [ ] FEATURE-PLAN included
+
 ### Generate Only
 - [ ] All functional requirements working
 - [ ] Setup script works (`setup.sh && make test`)
@@ -259,6 +299,7 @@ Copy this template, fill it out, and give it to Claude along with the appropriat
 | Task Type | Attach These Files |
 |---|---|
 | **Generate** | `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `prompts/PROMPT-CLAUDE-CODE-MASTER.md`, `TASK-BRIEF.md` |
+| **Add Function** | `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `prompts/PROMPT-ADD-FUNCTION.md`, `TASK-BRIEF.md` |
 | **Refactor** | `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `prompts/PROMPT-REFACTOR.md`, `TASK-BRIEF.md` |
 | **Debug** | `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `prompts/PROMPT-DEBUG.md`, `TASK-BRIEF.md` |
 | **Partial Rewrite** | `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `prompts/PROMPT-PARTIAL-REWRITE.md`, `TASK-BRIEF.md` |
