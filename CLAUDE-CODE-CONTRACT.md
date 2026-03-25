@@ -11,6 +11,39 @@
 3. **Tests are not optional.** Every deliverable includes unit tests + integration tests, minimum 80% coverage.
 4. **Documentation lives in code.** Docstrings, type hints, and inline comments explain *why*, not *what*.
 5. **No placeholder code.** Every function, every class, every module is production-grade or removed.
+6. **Right tool for the job.** Use the task mode that matches your intent — generate, refactor, debug, or rewrite.
+
+---
+
+## 🔀 Task Modes
+
+This contract supports four modes. Each mode uses a dedicated prompt from `prompts/` and has its own checklist. **Pick the mode that matches what you're doing.**
+
+| Mode | When to Use | Prompt File | Key Constraint |
+|---|---|---|---|
+| **Generate** | Build a new project from scratch | `PROMPT-CLAUDE-CODE-MASTER.md` | Ship complete, no TODOs |
+| **Refactor** | Restructure without changing behavior | `PROMPT-REFACTOR.md` | Existing tests pass unchanged |
+| **Debug** | Find and fix a specific bug | `PROMPT-DEBUG.md` | Failing test first, minimal fix |
+| **Partial Rewrite** | Replace a module with new implementation | `PROMPT-PARTIAL-REWRITE.md` | Callers don't break |
+
+### How to Choose
+
+```
+"I need to build something new"              → Generate
+"This code works but is messy"               → Refactor
+"This code is broken"                        → Debug
+"This module needs a fundamentally new design" → Partial Rewrite
+```
+
+### Shared Standards (All Modes)
+
+These apply regardless of which mode you're in:
+- 100% type hints on public APIs
+- Zero lint/type warnings
+- Zero TODOs or stubs
+- Explicit error handling
+- Structured logging
+- Tests pass (≥80% coverage)
 
 ---
 
@@ -741,21 +774,53 @@ func TestFetchUsersEndpoint(t *testing.T) {
 
 ---
 
-## 🏁 Pre-Delivery Checklist (Claude Code)
+## 🏁 Pre-Delivery Checklists
 
-Before returning code, verify:
+### All Modes — Universal Checklist
 
-- [ ] **All source files complete** — no TODOs, no stubs, no `// TODO: implement X`
+Before returning code in **any** mode, verify:
+
 - [ ] **Type hints 100%** — `mypy`, `tsc`, `cargo check`, or compiler passes with no errors
 - [ ] **Tests pass** — `pytest`, `vitest`, `go test`, `cargo test`, or `ctest` runs, all pass, ≥80% coverage
 - [ ] **Linting clean** — `ruff`, `eslint`, `clippy`, `clang-tidy`, `go vet` pass, zero warnings
+- [ ] **No secrets in code** — all config in `.env.example`, no API keys/tokens
+- [ ] **Error messages clear** — users understand what went wrong and how to fix it
+- [ ] **Naming consistent** — no `temp_var`, no `x`, no `do_thing_2()`
+
+### Generate Mode — Additional Checklist
+
+- [ ] **All source files complete** — no TODOs, no stubs, no `// TODO: implement X`
 - [ ] **Setup script works** — `setup.sh`, `npm install && npm test`, `cargo build`, or `cmake && make` succeeds on clean system
 - [ ] **README accurate** — examples run, installation instructions tested
-- [ ] **No secrets in code** — all config in `.env.example`, no API keys/tokens
 - [ ] **Git-ready** — `.gitignore` correct, `git status` shows only new files
-- [ ] **Error messages clear** — users understand what went wrong and how to fix it
 - [ ] **Logging added** — INFO/DEBUG/ERROR levels appropriate, no blind spots
-- [ ] **Naming consistent** — no `temp_var`, no `x`, no `do_thing_2()`
+
+### Refactor Mode — Additional Checklist
+
+- [ ] **Existing tests pass unchanged** — zero modifications to test files (unless imports moved)
+- [ ] **Public API preserved** — same function signatures, same error types, same return types
+- [ ] **Coverage maintained or improved** — never decreased from before
+- [ ] **REFACTOR-PLAN documented** — scope, goal, and what didn't change
+- [ ] **One logical change per step** — no combined structural + behavioral changes
+- [ ] **No bug fixes mixed in** — discovered bugs documented but not fixed
+
+### Debug Mode — Additional Checklist
+
+- [ ] **Regression test written** — fails before the fix, passes after
+- [ ] **Root cause documented** — DEBUG-REPORT with trace from symptom to cause
+- [ ] **Minimal fix** — fewest lines changed, no surrounding "improvements"
+- [ ] **No refactoring mixed in** — fix only, nothing else
+- [ ] **No temporary debug logging left** — all `[DEBUG]` statements removed
+- [ ] **Commit message references bug** — includes what was wrong and what test proves it
+
+### Partial Rewrite Mode — Additional Checklist
+
+- [ ] **Callers unaffected** — all integration tests pass, or migration guide provided
+- [ ] **REWRITE-PLAN documented** — scope, reason, boundary contracts, risk assessment
+- [ ] **New tests written** — unit tests for all new internal functions
+- [ ] **Migration guide** — if API changed, step-by-step instructions for callers
+- [ ] **Rollback path documented** — how to revert if the rewrite causes issues
+- [ ] **No scope creep** — only files in the rewrite scope were modified
 
 ---
 
@@ -947,8 +1012,9 @@ add_test(NAME unit_tests COMMAND test_all)
 
 ## 🚀 Final Handoff
 
-When code is ready:
+When code is ready, format the summary based on task mode:
 
+### Generate Mode
 ```
 ✅ DELIVERABLES
 ├── src/                # All source code
@@ -958,19 +1024,74 @@ When code is ready:
 ├── Makefile / scripts/ # Build tools
 └── IMPLEMENTATION.md   # This contract fulfilled
 
-Ready to: git add . && git commit -m "Initial commit: [project]"
+Ready to: git add . && git commit -m "feat: Initial [project] implementation"
+```
+
+### Refactor Mode
+```
+✅ REFACTOR COMPLETE
+├── Files modified:     [list]
+├── Files added:        [extracted modules, if any]
+├── Files removed:      [consolidated, if any]
+├── Tests:              All [N] existing tests pass (unchanged)
+├── Coverage:           [before]% → [after]%
+├── Key changes:        [bullet list]
+└── Public API:         Unchanged
+
+Ready to: git add . && git commit -m "refactor: [description of restructuring]"
+```
+
+### Debug Mode
+```
+✅ BUG FIXED
+├── Bug:                [one-line description]
+├── Root cause:         [what was wrong]
+├── Files modified:     [list]
+├── Lines changed:      [count]
+├── Regression test:    [test name]
+├── All tests:          [N] passed, [coverage]%
+└── Verified:           Reproduction steps no longer trigger bug
+
+Ready to: git add . && git commit -m "fix: [description of bug fix]"
+```
+
+### Partial Rewrite Mode
+```
+✅ REWRITE COMPLETE
+├── Module rewritten:   [name]
+├── Reason:             [why]
+├── Files replaced:     [old → new]
+├── API changes:        [none / list]
+├── Migration required: [yes/no]
+├── Tests:              [N] existing passed, [N] new added
+├── Coverage:           [before]% → [after]%
+└── Rollback:           [revert instructions]
+
+Ready to: git add . && git commit -m "rewrite: [description of module replacement]"
 ```
 
 ---
 
 ## 🔄 When Claude Code Falls Short
 
-If generated code doesn't meet this standard:
+If output doesn't meet this standard:
 
 1. **Call it out immediately** — "This violates section [X] of the contract"
 2. **Be specific** — "Missing error handling in `fetch_user()`" not "bad code"
 3. **Rerun with clarification** — "Regenerate `src/api.ts` with explicit error types and 100% test coverage"
-4. **Escalate if needed** — Use Sonnet for architectural review
+4. **Check the mode** — Did you use the right task mode? A "debug" request handled as "generate" will produce wrong results
+5. **Escalate if needed** — Use Sonnet for architectural review
+
+### Mode-Specific Rejection Examples
+
+**Refactor rejected:**
+> "Existing test `test_validate_email` fails after your refactoring. The refactor changed behavior — `validate_email()` now returns lowercase but the test expects original case. Revert the behavior change and only restructure."
+
+**Debug rejected:**
+> "Your fix also refactored the surrounding code. Revert lines 45-78 which are cosmetic changes. Keep only the one-line fix on line 52 and the regression test."
+
+**Partial Rewrite rejected:**
+> "The `fetch_user()` function now raises `NotFoundError` instead of returning `None`, but callers in `src/api/handlers.py` still check for `None`. Either preserve the old behavior or update all callers and document the migration."
 
 ---
 

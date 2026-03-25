@@ -1,6 +1,9 @@
-# PROMPT: Claude Code — Master Generator
+# PROMPT: Claude Code — Master Generator (Generate Mode)
 
-**Use this prompt when spawning a Claude Code session for production code generation.**
+**Use this prompt when building a new project from scratch. For other task types, use the dedicated prompts:**
+- **Refactoring existing code →** `PROMPT-REFACTOR.md`
+- **Fixing a bug →** `PROMPT-DEBUG.md`
+- **Replacing a module →** `PROMPT-PARTIAL-REWRITE.md`
 
 ---
 
@@ -379,10 +382,12 @@ git log --oneline  # Show last commit
 ## What I'm Handing You
 
 **Input Files:**
-- `TASK-BRIEF.md` — Problem statement
+- `TASK-BRIEF.md` — Problem statement (check the **Task Type** field)
 - `CODING-CONTEXT.md` — Language/project standards
 - `CLAUDE-CODE-CONTRACT.md` — Quality standards
-- Project files (if iterating): `src/`, `tests/`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `CMakeLists.txt`, etc.
+- This prompt (`PROMPT-CLAUDE-CODE-MASTER.md`) — Generate mode instructions
+
+> **Important:** If the TASK-BRIEF specifies a task type other than "Generate", stop and tell the user to use the matching prompt instead (`PROMPT-REFACTOR.md`, `PROMPT-DEBUG.md`, or `PROMPT-PARTIAL-REWRITE.md`). Each mode has different constraints and checklists.
 
 ---
 
