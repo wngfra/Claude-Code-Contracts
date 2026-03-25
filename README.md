@@ -14,8 +14,9 @@ claude-code-contracts/
 ├── CLAUDE-CODE-CONTRACT.md                ← quality standards (attach to every session)
 ├── CLAUDE-CODE-GUIDE.md                   ← detailed walkthrough with examples
 ├── CLAUDE-CODE-CHEATSHEET.md              ← quick reference & copy-paste templates
+├── THINKING-FRAMEWORKS.md                 ← problem decomposition & algorithm design
 ├── TASK-BRIEF-TEMPLATE.md                ← copy this for each task
-├── CODING-CONTEXT.md                      ← language-specific rules
+├── CODING-CONTEXT.md                      ← language-specific rules & algorithmic guidance
 └── prompts/
     ├── PROMPT-CLAUDE-CODE-MASTER.md       ← Generate mode (new projects)
     ├── PROMPT-REFACTOR.md                 ← Refactor mode (restructure existing code)
@@ -158,6 +159,20 @@ See `CLAUDE-CODE-CHEATSHEET.md` for copy-paste rejection templates.
 
 ---
 
+## Token Efficiency
+
+Not every session needs all files. Attach only what your task requires:
+
+| Session Type | Attach | Can Skip |
+|---|---|---|
+| Quick generate | CONTRACT + PROMPT + BRIEF | GUIDE, CHEATSHEET, THINKING-FRAMEWORKS |
+| Complex/novel generate | CONTRACT + PROMPT + BRIEF + THINKING-FRAMEWORKS | GUIDE, CHEATSHEET |
+| Refactor / Debug / Rewrite | CONTRACT + matching PROMPT + BRIEF | CHEATSHEET, THINKING-FRAMEWORKS |
+
+For large projects, split across sessions: core types → API layer → test suite. See GUIDE §Token Efficiency.
+
+---
+
 ## Further Reading
 
 | File | When to read |
@@ -165,6 +180,7 @@ See `CLAUDE-CODE-CHEATSHEET.md` for copy-paste rejection templates.
 | `CLAUDE-CODE-GUIDE.md` | First time — full walkthrough with examples for all 4 modes |
 | `CLAUDE-CODE-CHEATSHEET.md` | During a project — quick reference & copy-paste templates |
 | `CLAUDE-CODE-CONTRACT.md` | When reviewing output against standards |
+| `THINKING-FRAMEWORKS.md` | Complex tasks — problem decomposition, algorithms, novel domains |
 | `CODING-CONTEXT.md` | When customizing for your language/project |
 | `prompts/PROMPT-REFACTOR.md` | Understanding refactor mode constraints |
 | `prompts/PROMPT-DEBUG.md` | Understanding debug mode constraints |
