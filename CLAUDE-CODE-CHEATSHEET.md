@@ -42,16 +42,10 @@ That's it. Claude Code handles the rest.
 
 ```bash
 cd ~/my-project
-claude
+claude --add-dir /path/to/claude-code-contracts
 
-# Inside the session, load contract files:
-> /add /path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md
-> /add /path/to/claude-code-contracts/CODING-CONTEXT.md
-> /add /path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md
-> /add TASK-BRIEF.md
-
-# Then type your prompt:
-> Generate production code following CLAUDE-CODE-CONTRACT.md and TASK-BRIEF.md
+# Inside the session, reference contract files with @ and type your prompt:
+> @/path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md @/path/to/claude-code-contracts/CODING-CONTEXT.md @/path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md @TASK-BRIEF.md Generate production code following the contract and task brief.
 ```
 
 ### One-shot (pipe mode)
