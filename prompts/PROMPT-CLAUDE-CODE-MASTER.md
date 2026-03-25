@@ -32,11 +32,31 @@ Reference: `CLAUDE-CODE-CONTRACT.md` — follow every requirement without except
   - Use `from typing import` for complex types
   - Use Pydantic `@dataclass` or `BaseModel` for data structures
   - Run `mypy` — must pass with zero errors
-  
+
 - **TypeScript:** Strict mode enabled, full type coverage
   - All function parameters and returns typed
   - No `any` types except where explicitly documented
   - Run `tsc --noEmit` — must pass with zero errors
+
+- **Rust:** Full type annotations on all public functions
+  - Use `Result<T, E>` for all fallible operations
+  - Use `thiserror` for custom error types
+  - Run `cargo check` and `cargo clippy -- -D warnings` — must pass with zero errors
+
+- **Go:** All exported functions documented with godoc comments
+  - Return `error` as last return value for fallible operations
+  - Use `fmt.Errorf("...: %w", err)` for error wrapping
+  - Run `go vet ./...` — must pass with zero errors
+
+- **C:** Consistent function signatures with documented parameters
+  - Use fixed-width types (`stdint.h`) for cross-platform safety
+  - Return error codes (0 = success, negative = error)
+  - Compile with `-Wall -Wextra -Werror` — must pass with zero warnings
+
+- **C++:** Full const-correctness, RAII for all resources
+  - Use `std::optional`, `std::variant`, `std::expected` where appropriate
+  - Smart pointers over raw `new`/`delete`
+  - Compile with `-Wall -Wextra -Werror` — must pass with zero warnings
 
 ### 3. Testing (Minimum 80% Coverage)
 
@@ -66,9 +86,11 @@ tests/
 
 **Commands:**
 ```bash
-pytest tests/ --cov=src --cov-report=html
-# or
-vitest --coverage
+pytest tests/ --cov=src --cov-report=html          # Python
+vitest --coverage                                     # TypeScript
+go test ./... -v -cover -coverprofile=coverage.out   # Go
+cargo tarpaulin --out html                            # Rust (coverage)
+cd build && ctest --output-on-failure                 # C/C++
 ```
 
 All tests must **pass**, coverage ≥80%, **zero skipped tests**.
@@ -230,24 +252,119 @@ clean:
 }
 ```
 
+**Makefile (Rust):**
+```makefile
+.PHONY: build test lint format run clean
+
+build:
+	cargo build --release
+
+test:
+	cargo test -- --nocapture
+	cargo tarpaulin --out html
+
+lint:
+	cargo clippy -- -D warnings
+	cargo fmt -- --check
+
+format:
+	cargo fmt
+
+run:
+	cargo run
+
+clean:
+	cargo clean
+```
+
+**Makefile (Go):**
+```makefile
+.PHONY: build test lint format run clean
+
+build:
+	go build -o bin/app ./cmd/...
+
+test:
+	go test ./... -v -cover -coverprofile=coverage.out
+	go tool cover -html=coverage.out -o coverage.html
+
+lint:
+	go vet ./...
+	golangci-lint run
+
+format:
+	gofmt -w .
+	goimports -w .
+
+run:
+	go run ./cmd/main.go
+
+clean:
+	rm -rf bin/ coverage.out coverage.html
+```
+
+**Makefile (C/C++):**
+```makefile
+.PHONY: build test lint run clean
+
+build:
+	mkdir -p build && cd build && cmake .. && make
+
+test:
+	cd build && ctest --output-on-failure
+
+lint:
+	clang-tidy src/*.c src/*.cpp -- -std=c17 -std=c++17
+	cppcheck --enable=all --error-exitcode=1 src/
+
+run:
+	./build/myapp
+
+clean:
+	rm -rf build/
+```
+
 Run these before returning code:
 ```bash
 make test && make lint
 # or
 npm test && npm run lint
+# or
+cargo test && cargo clippy -- -D warnings
+# or
+go test ./... && go vet ./...
 ```
 
 ### 8. Git Ready
 
 **.gitignore:**
 ```
+# Python
 __pycache__/
 *.pyc
 .pytest_cache/
 htmlcov/
-.env
+
+# TypeScript/Node
 dist/
 node_modules/
+
+# Rust
+target/
+
+# Go
+bin/
+coverage.out
+
+# C/C++
+build/
+*.o
+*.a
+*.so
+*.dylib
+
+# Common
+.env
 ```
 
 After generation:
@@ -265,7 +382,7 @@ git log --oneline  # Show last commit
 - `TASK-BRIEF.md` — Problem statement
 - `CODING-CONTEXT.md` — Language/project standards
 - `CLAUDE-CODE-CONTRACT.md` — Quality standards
-- Project files (if iterating): `src/`, `tests/`, `pyproject.toml`, etc.
+- Project files (if iterating): `src/`, `tests/`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `CMakeLists.txt`, etc.
 
 ---
 
