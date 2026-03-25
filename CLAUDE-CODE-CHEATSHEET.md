@@ -541,144 +541,23 @@ def cache_users(ttl: int = 300):
 
 ## 11. Boilerplate Code Snippets
 
-### Error Handling (Python)
-```python
-class ApplicationError(Exception):
-    """Base error."""
-    pass
+> **Full examples for all 6 languages** (Python, TypeScript, Rust, Go, C, C++) are in `CLAUDE-CODE-CONTRACT.md` §Language-Specific Standards. Each includes:
+> - Error handling with custom exception hierarchy
+> - Structured logging patterns
+> - Testing examples (unit + integration)
+> - Type hint / type safety patterns
+>
+> **Refer to the contract instead of duplicating here.** This saves ~4,000 tokens per session.
 
-class ValidationError(ApplicationError):
-    pass
+### Quick Pattern Reference (all languages)
 
-class NotFoundError(ApplicationError):
-    pass
-
-def safe_fetch(user_id: str) -> User:
-    if not user_id:
-        raise ValidationError("user_id cannot be empty")
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise NotFoundError(f"User {user_id} not found")
-    return user
-```
-
-### Logging (Python)
-```python
-import logging
-
-logger = logging.getLogger(__name__)
-
-def process_user(user_id: str) -> None:
-    logger.info(f"Processing user: {user_id}")
-    try:
-        user = fetch_user(user_id)
-        logger.debug(f"Fetched: {user}")
-    except ValidationError as e:
-        logger.warning(f"Validation failed: {e}")
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}", exc_info=True)
-        raise
-```
-
-### Error Handling (TypeScript)
-```typescript
-class ApplicationError extends Error {
-  constructor(public code: string, message: string) {
-    super(message);
-    this.name = 'ApplicationError';
-  }
-}
-
-async function safeAsync<T>(fn: () => Promise<T>): Promise<T> {
-  try {
-    return await fn();
-  } catch (error) {
-    if (error instanceof ApplicationError) {
-      logger.error({ code: error.code }, error.message);
-    } else {
-      logger.error({ error }, 'Unexpected error');
-    }
-    throw error;
-  }
-}
-```
-
-### Error Handling (Rust)
-```rust
-use thiserror::Error;
-
-#[derive(Error, Debug)]
-pub enum AppError {
-    #[error("validation: {0}")]
-    Validation(String),
-    #[error("not found: {0}")]
-    NotFound(String),
-    #[error("database: {source}")]
-    Database { #[from] source: sqlx::Error },
-}
-
-pub fn safe_fetch(user_id: &str) -> Result<User, AppError> {
-    if user_id.is_empty() {
-        return Err(AppError::Validation("user_id cannot be empty".into()));
-    }
-    db.query_user(user_id)
-        .map_err(AppError::from)?
-        .ok_or_else(|| AppError::NotFound(format!("User {user_id}")))
-}
-```
-
-### Error Handling (Go)
-```go
-import (
-    "errors"
-    "fmt"
-)
-
-var ErrNotFound = errors.New("not found")
-
-func SafeFetch(ctx context.Context, userID string) (*User, error) {
-    if userID == "" {
-        return nil, fmt.Errorf("user_id cannot be empty: %w", ErrInvalidInput)
-    }
-    user, err := db.QueryUser(ctx, userID)
-    if err != nil {
-        return nil, fmt.Errorf("fetch user %s: %w", userID, err)
-    }
-    if user == nil {
-        return nil, fmt.Errorf("user %s: %w", userID, ErrNotFound)
-    }
-    return user, nil
-}
-```
-
-### Error Handling (C)
-```c
-typedef enum { ERR_OK = 0, ERR_INVALID = -1, ERR_NOT_FOUND = -2 } ErrorCode;
-
-ErrorCode safe_fetch(const char *user_id, User *out) {
-    if (!user_id || !user_id[0]) return ERR_INVALID;
-    if (db_query_user(user_id, out) != 0) return ERR_NOT_FOUND;
-    return ERR_OK;
-}
-```
-
-### Error Handling (C++)
-```cpp
-#include <stdexcept>
-
-class AppError : public std::runtime_error {
-    using std::runtime_error::runtime_error;
-};
-class ValidationError : public AppError { using AppError::AppError; };
-class NotFoundError : public AppError { using AppError::AppError; };
-
-User safe_fetch(const std::string &user_id) {
-    if (user_id.empty()) throw ValidationError("user_id cannot be empty");
-    auto user = db.query_user(user_id);
-    if (!user) throw NotFoundError("User " + user_id + " not found");
-    return *user;
-}
-```
+| Pattern | Rule |
+|---------|------|
+| **Error hierarchy** | Base error → domain-specific errors (Validation, NotFound, Database) |
+| **Error messages** | Include what failed + which input: `f"Failed to fetch user {user_id}: {e}"` |
+| **Error chaining** | Python: `raise X from e` / Go: `fmt.Errorf("...: %w", err)` / Rust: `#[from]` |
+| **Logging** | `info` for operations, `debug` for data, `error` for failures with context |
+| **Never** | Empty catch/except, bare `raise`, silent error swallowing |
 
 ---
 
@@ -699,6 +578,52 @@ If any answer is "no", it's not ready.
 
 ---
 
+## 13. Token Efficiency Tips
+
+### Minimal Attachment Strategy
+
+Not every session needs all files. Choose the minimum context:
+
+| Session Type | Attach | Skip |
+|---|---|---|
+| **Quick generate** (small project) | CONTRACT + matching PROMPT + BRIEF | GUIDE, CHEATSHEET, THINKING-FRAMEWORKS |
+| **Complex generate** (novel domain) | CONTRACT + PROMPT + BRIEF + THINKING-FRAMEWORKS | GUIDE, CHEATSHEET |
+| **Refactor / Debug** | CONTRACT + matching PROMPT + BRIEF | CHEATSHEET, THINKING-FRAMEWORKS, CODING-CONTEXT |
+| **Reference lookup** | CHEATSHEET only | Everything else |
+
+### Reduce Prompt Size
+
+- Use **task brief** for specifics — don't repeat what's in the contract
+- For repeat projects in the same language, drop other language sections from CONTRACT
+- Use CHEATSHEET for quick jobs, full CONTRACT for production work
+
+### Session Splitting for Large Projects
+
+```
+Session 1: "Generate core types and business logic" (src/core/, src/models/)
+Session 2: "Generate API layer using the core from Session 1" (src/api/)
+Session 3: "Generate test suite for existing code" (tests/)
+```
+
+Each session is smaller, more focused, and uses fewer tokens than one massive generation.
+
+---
+
+## 14. Handling Complex Tasks
+
+For non-trivial problems (algorithm design, unfamiliar domains, architectural decisions):
+
+→ Attach `THINKING-FRAMEWORKS.md` alongside the contract and prompt.
+
+It provides:
+- Problem decomposition (invariants → core subproblem → solution shape)
+- Algorithm design principles (data structure selection, complexity contracts)
+- Novel domain handling (vocabulary → constraints → operations → analogies)
+- Design decision documentation template
+- Incremental complexity management (build in layers, verify each)
+
+---
+
 ## Remember
 
 > **Quality is not about perfection. It's about clarity, completeness, and care.**
@@ -707,5 +632,5 @@ Use this cheat sheet to enforce that. Every time.
 
 ---
 
-**Last Updated:** March 2026  
-**Version:** 1.0
+**Last Updated:** March 2026
+**Version:** 1.1

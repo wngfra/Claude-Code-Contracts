@@ -113,9 +113,64 @@ tests/
     └── test_handlers.py         # Event handler callbacks
 ```
 
+## Algorithmic Thinking & Performance
+
+### Complexity Awareness
+
+Always consider the complexity of your approach before implementing:
+
+| Data Size | Acceptable Complexity | Example |
+|-----------|----------------------|---------|
+| n ≤ 20 | O(2^n), O(n!) | Brute force, permutations |
+| n ≤ 1,000 | O(n²) | Nested loops |
+| n ≤ 100,000 | O(n log n) | Sort-based solutions |
+| n ≤ 10,000,000 | O(n) | Single pass, hash maps |
+| n > 10,000,000 | O(log n), O(1) | Binary search, math |
+
+### Data Structure Selection
+
+Choose structures that match your access pattern:
+
+```
+Need fast lookup?          → HashMap (O(1))
+Need sorted order?         → BTreeMap/TreeSet (O(log n))
+Need fast min/max?         → Heap (O(log n) push, O(1) peek)
+Need FIFO?                 → Queue/Deque (O(1))
+Need undo/backtrack?       → Stack (O(1))
+Need membership + count?   → Counter/MultiSet
+Need disjoint groups?      → Union-Find (α(n) ≈ O(1))
+Need prefix/range sums?    → Prefix array or segment tree
+```
+
+### Performance Patterns
+
+- **Batch I/O:** Collect items, then write once — not write-per-item
+- **Lazy evaluation:** Don't compute what you won't use (generators, iterators)
+- **Precompute:** If the same subresult is used N times, compute once and cache
+- **Avoid allocations in hot loops:** Reuse buffers, pre-allocate collections
+- **Profile before optimizing:** Never guess where the bottleneck is
+
+### Algorithm Design Checklist
+
+When designing a non-trivial algorithm:
+1. State the problem precisely (inputs, outputs, constraints)
+2. Write down the complexity target before coding
+3. Consider at least 2 approaches and pick the simpler one that meets the target
+4. If using greedy or DP, state why it's correct (greedy proof / optimal substructure)
+5. Handle edge cases: empty input, single element, maximum size, duplicates
+
+> For deeper frameworks, see `THINKING-FRAMEWORKS.md`.
+
 ## Cache-Friendly Patterns
 
 - Include full file context upfront (don't ask "what's in X?")
 - Use consistent naming across projects
 - Batch similar requests (3+ CAD designs, then 3+ code reviews)
 - Preserve tool outputs in context for multi-step work
+
+## Token Efficiency
+
+- Attach only the files needed for your task type (see CHEATSHEET §13)
+- For single-language projects, the full multi-language CONTRACT can be trimmed
+- Split large projects across sessions: core → API → tests
+- Reference CONTRACT sections instead of restating rules in the TASK-BRIEF

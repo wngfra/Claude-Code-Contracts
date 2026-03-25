@@ -11,7 +11,8 @@ Complete walkthrough for generating production-grade code with Claude using the 
 | File | Purpose |
 |---|---|
 | **CLAUDE-CODE-CONTRACT.md** | Quality standards (100% type hints, 80%+ tests, etc.) |
-| **CODING-CONTEXT.md** | Language-specific rules and project context |
+| **CODING-CONTEXT.md** | Language-specific rules, algorithmic guidance, project context |
+| **THINKING-FRAMEWORKS.md** | Problem decomposition, algorithm design, novel domain handling |
 | **TASK-BRIEF-TEMPLATE.md** | Your project requirements — copy and fill for each task |
 
 ### Task Mode Prompts
@@ -407,6 +408,44 @@ A common mistake is using the wrong mode:
 | "The whole thing needs a redo" | Partial Rewrite | Generate (start fresh) |
 
 **Rule of thumb:** If in doubt, start with the narrower mode. You can always follow up with a broader one.
+
+---
+
+## Token Efficiency
+
+### Attach Only What You Need
+
+Not every session needs every file. Use the minimum context for your task:
+
+| Session Type | Attach | Can Skip |
+|---|---|---|
+| Quick generate (small project) | CONTRACT + PROMPT + BRIEF | GUIDE, CHEATSHEET, THINKING-FRAMEWORKS |
+| Complex generate (novel domain) | CONTRACT + PROMPT + BRIEF + THINKING-FRAMEWORKS | GUIDE, CHEATSHEET |
+| Refactor / Debug / Rewrite | CONTRACT + matching PROMPT + BRIEF | CHEATSHEET, THINKING-FRAMEWORKS |
+| Reference lookup | CHEATSHEET only | Everything else |
+
+### Split Large Projects
+
+Instead of one massive generation, split into focused sessions:
+```
+Session 1: Core types and business logic (src/core/, src/models/)
+Session 2: API layer (src/api/) — attach Session 1 output as context
+Session 3: Test suite (tests/) — attach src/ as context
+```
+
+Each session uses fewer tokens, produces more focused output, and is easier to verify.
+
+---
+
+## When Tasks Are Complex or Novel
+
+For tasks involving algorithmic design, unfamiliar domains, or architectural decisions, attach `THINKING-FRAMEWORKS.md` alongside the contract. It provides:
+
+- **Problem decomposition:** Invariants → core subproblem → solution shape
+- **Algorithm design:** Data structure selection, complexity contracts, pattern recognition
+- **Novel domains:** Vocabulary-first modeling, analogy bridges to known solutions
+- **Design decisions:** Trade-off documentation framework
+- **Layered building:** Types → core → integration → errors → optimization
 
 ---
 

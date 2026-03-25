@@ -31,35 +31,15 @@ Reference: `CLAUDE-CODE-CONTRACT.md` — follow every requirement without except
 - [ ] No framework-specific code in core logic
 
 ### 2. Type System (100% Required)
-- **Python:** Full type hints on all public functions + classes
-  - Use `from typing import` for complex types
-  - Use Pydantic `@dataclass` or `BaseModel` for data structures
-  - Run `mypy` — must pass with zero errors
 
-- **TypeScript:** Strict mode enabled, full type coverage
-  - All function parameters and returns typed
-  - No `any` types except where explicitly documented
-  - Run `tsc --noEmit` — must pass with zero errors
+> Full language-specific standards in `CLAUDE-CODE-CONTRACT.md` §Python/TypeScript/Rust/Go/C/C++ sections. Key rules per language:
 
-- **Rust:** Full type annotations on all public functions
-  - Use `Result<T, E>` for all fallible operations
-  - Use `thiserror` for custom error types
-  - Run `cargo check` and `cargo clippy -- -D warnings` — must pass with zero errors
-
-- **Go:** All exported functions documented with godoc comments
-  - Return `error` as last return value for fallible operations
-  - Use `fmt.Errorf("...: %w", err)` for error wrapping
-  - Run `go vet ./...` — must pass with zero errors
-
-- **C:** Consistent function signatures with documented parameters
-  - Use fixed-width types (`stdint.h`) for cross-platform safety
-  - Return error codes (0 = success, negative = error)
-  - Compile with `-Wall -Wextra -Werror` — must pass with zero warnings
-
-- **C++:** Full const-correctness, RAII for all resources
-  - Use `std::optional`, `std::variant`, `std::expected` where appropriate
-  - Smart pointers over raw `new`/`delete`
-  - Compile with `-Wall -Wextra -Werror` — must pass with zero warnings
+- **Python:** 100% type hints, `mypy` passes, Pydantic for data structures
+- **TypeScript:** Strict mode, no `any`, `tsc --noEmit` passes
+- **Rust:** `Result<T, E>` everywhere, `thiserror`, `clippy -D warnings` passes
+- **Go:** Exported functions documented, `error` wrapping with `%w`, `go vet` passes
+- **C:** Fixed-width types, error codes, `-Wall -Wextra -Werror` passes
+- **C++:** RAII, smart pointers, const-correctness, `-Wall -Wextra -Werror` passes
 
 ### 3. Testing (Minimum 80% Coverage)
 
@@ -153,45 +133,14 @@ def validate_user(user: User) -> Optional[Dict[str, str]]:
 
 ### 5. Logging & Error Handling
 
-**Logging:**
-```python
-import logging
+> Full examples per language in `CLAUDE-CODE-CONTRACT.md` §Language-Specific Standards.
 
-logger = logging.getLogger(__name__)
-
-def process_user(user_id: str) -> User:
-    logger.info(f"Processing user: {user_id}")
-    try:
-        user = fetch_user(user_id)
-        logger.debug(f"Fetched user: {user.name}")
-        return user
-    except DatabaseError as e:
-        logger.error(f"Database error for user {user_id}: {e}", exc_info=True)
-        raise
-```
-
-**Error Handling:**
-```python
-class ApplicationError(Exception):
-    """Base error."""
-    pass
-
-class ValidationError(ApplicationError):
-    """User input validation failed."""
-    pass
-
-class DatabaseError(ApplicationError):
-    """Database operation failed."""
-    pass
-
-def fetch_user(user_id: str) -> User:
-    if not user_id:
-        raise ValidationError("user_id cannot be empty")
-    try:
-        return db.query(User).filter(User.id == user_id).first()
-    except Exception as e:
-        raise DatabaseError(f"Failed to fetch user {user_id}: {e}") from e
-```
+**Rules (all languages):**
+- Custom exception/error hierarchy — never bare `Exception` or `error`
+- Explicit error messages with context (what failed, with which input)
+- Structured logging: `logger.info/debug/error` with contextual fields
+- `raise ... from e` (Python) / error wrapping (Go/Rust) — preserve cause chains
+- Never swallow errors silently — log + re-raise, or handle explicitly
 
 ### 6. Configuration
 
@@ -214,168 +163,35 @@ SENDGRID_API_KEY=SG_XXX
 
 ### 7. Build & Test Automation
 
-**Makefile (Python):**
-```makefile
-.PHONY: install test lint format run clean
+> Full Makefile/build templates per language in `CLAUDE-CODE-CONTRACT.md` §Versioning & Dependencies and `CODING-CONTEXT.md` §Build Commands.
 
-install:
-	pip install -e ".[dev]"
+**Every project must have:**
+- `make test` / `npm test` / `cargo test` / `go test ./...` — runs all tests with coverage
+- `make lint` / `npm run lint` — runs linter + type checker
+- `make run` / `npm start` / `cargo run` — starts the application
+- `setup.sh` or equivalent — one-command install on clean system
 
-test:
-	pytest tests/ --cov=src --cov-report=html
-
-lint:
-	ruff check src/ tests/
-	mypy src/
-
-format:
-	black src/ tests/
-	isort src/ tests/
-
-run:
-	python -m src.main
-
-clean:
-	find . -type d -name __pycache__ -exec rm -rf {} +
-	find . -type f -name "*.pyc" -delete
-	rm -rf .pytest_cache/ htmlcov/
-```
-
-**package.json scripts (TypeScript):**
-```json
-{
-  "scripts": {
-    "install": "npm install",
-    "build": "tsc",
-    "test": "vitest --coverage",
-    "lint": "eslint src/ --fix && tsc --noEmit",
-    "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js"
-  }
-}
-```
-
-**Makefile (Rust):**
-```makefile
-.PHONY: build test lint format run clean
-
-build:
-	cargo build --release
-
-test:
-	cargo test -- --nocapture
-	cargo tarpaulin --out html
-
-lint:
-	cargo clippy -- -D warnings
-	cargo fmt -- --check
-
-format:
-	cargo fmt
-
-run:
-	cargo run
-
-clean:
-	cargo clean
-```
-
-**Makefile (Go):**
-```makefile
-.PHONY: build test lint format run clean
-
-build:
-	go build -o bin/app ./cmd/...
-
-test:
-	go test ./... -v -cover -coverprofile=coverage.out
-	go tool cover -html=coverage.out -o coverage.html
-
-lint:
-	go vet ./...
-	golangci-lint run
-
-format:
-	gofmt -w .
-	goimports -w .
-
-run:
-	go run ./cmd/main.go
-
-clean:
-	rm -rf bin/ coverage.out coverage.html
-```
-
-**Makefile (C/C++):**
-```makefile
-.PHONY: build test lint run clean
-
-build:
-	mkdir -p build && cd build && cmake .. && make
-
-test:
-	cd build && ctest --output-on-failure
-
-lint:
-	clang-tidy src/*.c src/*.cpp -- -std=c17 -std=c++17
-	cppcheck --enable=all --error-exitcode=1 src/
-
-run:
-	./build/myapp
-
-clean:
-	rm -rf build/
-```
-
-Run these before returning code:
+**Run before returning code:**
 ```bash
-make test && make lint
-# or
-npm test && npm run lint
-# or
-cargo test && cargo clippy -- -D warnings
-# or
-go test ./... && go vet ./...
+make test && make lint  # or language equivalent
 ```
 
 ### 8. Git Ready
 
-**.gitignore:**
-```
-# Python
-__pycache__/
-*.pyc
-.pytest_cache/
-htmlcov/
+- `.gitignore` correct for project language (build artifacts, deps, `.env`)
+- Ready to `git add . && git commit -m "feat: Initial [project] implementation"`
 
-# TypeScript/Node
-dist/
-node_modules/
+---
 
-# Rust
-target/
+## Approach to Novel or Complex Tasks
 
-# Go
-bin/
-coverage.out
+When the task involves non-trivial design decisions, unfamiliar domains, or algorithmic challenges:
 
-# C/C++
-build/
-*.o
-*.a
-*.so
-*.dylib
-
-# Common
-.env
-```
-
-After generation:
-```bash
-git add .
-git commit -m "feat: Initial [project] implementation"
-git log --oneline  # Show last commit
-```
+1. **Decompose first.** Identify the core subproblem before choosing libraries or frameworks. (See `THINKING-FRAMEWORKS.md` §Problem Decomposition)
+2. **Choose data structures before algorithms.** The right structure makes the algorithm obvious.
+3. **Build in layers.** Types → core logic → integration → error handling → optimization. Verify each layer.
+4. **Document trade-offs.** When choosing between approaches, record what you chose and why.
+5. **Make illegal states unrepresentable.** Use the type system to prevent bugs at compile time.
 
 ---
 
@@ -385,6 +201,7 @@ git log --oneline  # Show last commit
 - `TASK-BRIEF.md` — Problem statement (check the **Task Type** field)
 - `CODING-CONTEXT.md` — Language/project standards
 - `CLAUDE-CODE-CONTRACT.md` — Quality standards
+- `THINKING-FRAMEWORKS.md` — Problem decomposition & algorithm design (for complex tasks)
 - This prompt (`PROMPT-CLAUDE-CODE-MASTER.md`) — Generate mode instructions
 
 > **Important:** If the TASK-BRIEF specifies a task type other than "Generate", stop and tell the user to use the matching prompt instead (`PROMPT-REFACTOR.md`, `PROMPT-DEBUG.md`, or `PROMPT-PARTIAL-REWRITE.md`). Each mode has different constraints and checklists.

@@ -66,15 +66,27 @@ Location: /Users/alex/.openclaw/workspace/claude-code-contracts/
 │   ├─ Known Unknowns
 │   └─ Notes
 │
-├── CODING-CONTEXT.md (4.2 KB) ⭐ LANGUAGE STANDARDS
-│   └─ Language-specific rules (Python, TypeScript, Go)
+├── CODING-CONTEXT.md (6 KB) ⭐ LANGUAGE STANDARDS
+│   └─ Language-specific rules (Python, TypeScript, Go, Rust, C, C++)
 │   ├─ Type Hints (Python/TypeScript)
 │   ├─ Formatting Standards
 │   ├─ Error Handling Patterns
 │   ├─ Logging Standards
 │   ├─ Testing Standards
+│   ├─ Algorithmic Thinking & Performance
 │   ├─ Cache-Friendly Patterns
+│   ├─ Token Efficiency Tips
 │   └─ Visual Validation (for UI projects)
+│
+├── THINKING-FRAMEWORKS.md (8 KB) ⭐ COMPLEX TASKS
+│   └─ Problem decomposition, algorithm design, novel domains
+│   ├─ Problem Decomposition Framework (invariants, core subproblem, solution shape)
+│   ├─ Algorithm Design Principles (data structures, complexity, patterns)
+│   ├─ Handling Novel Domains (vocabulary, constraints, analogy bridges)
+│   ├─ Design Decision Framework (trade-offs, simplicity test)
+│   ├─ Incremental Complexity Management (layered building)
+│   ├─ Error Space Thinking (enumerate failures before coding)
+│   └─ When to Use Advanced Techniques (concurrency, caching, streaming)
 │
 └── prompts/
     ├─ PROMPT-CLAUDE-CODE-MASTER.md (9 KB) ⭐ GENERATE MODE
@@ -127,6 +139,7 @@ When spawning a Claude Code session, attach:
      • Refactor:        prompts/PROMPT-REFACTOR.md
      • Debug:           prompts/PROMPT-DEBUG.md
      • Partial Rewrite: prompts/PROMPT-PARTIAL-REWRITE.md
+  5. THINKING-FRAMEWORKS.md                (optional — for complex/novel tasks)
 
 ════════════════════════════════════════════════════════════════════
 

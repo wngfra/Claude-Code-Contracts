@@ -828,6 +828,10 @@ Before returning code in **any** mode, verify:
 
 ### What "Good Taste" Means
 
+Good taste is the difference between code that works and code that communicates. It's about making the reader's job easy and the maintainer's job boring.
+
+### Foundation: Naming, Nesting, Responsibility
+
 **Clear naming:**
 ```python
 # ❌ Bad
@@ -843,7 +847,7 @@ def calculate_double_value(config: Dict[str, int]) -> int:
     return initial_value * 2
 ```
 
-**Minimal nesting:**
+**Minimal nesting (early return):**
 ```python
 # ❌ Bad (3+ levels)
 def validate_user(user):
@@ -853,52 +857,173 @@ def validate_user(user):
                 return True
     return False
 
-# ✅ Good (early return)
+# ✅ Good
 def is_valid_email(email: str) -> bool:
-    """Check if email is valid format."""
     if not email or '@' not in email:
         return False
     return True
 ```
 
-**One responsibility per function:**
-```python
-# ❌ Bad (does 3 things)
-def process_and_save_and_notify(user_id):
-    user = fetch_user(user_id)
-    process_user(user)
-    save_to_db(user)
-    send_email(user)
-
-# ✅ Good (one per function)
-def fetch_and_validate_user(user_id: str) -> User:
-    """Fetch user from DB, validate."""
-    user = fetch_user(user_id)
-    validate_user(user)
-    return user
-
-def save_user(user: User) -> None:
-    """Persist user to database."""
-    db.save(user)
-
-def notify_user(user: User) -> None:
-    """Send notification email."""
-    send_email(user.email, ...)
-```
-
 **Comment the "why", not the "what":**
 ```python
-# ❌ Bad (obvious)
+# ❌ Bad
 x = user['age']  # Get the user's age
-if x > 18:  # Check if age is greater than 18
-    send_email()  # Send an email
 
-# ✅ Good (explains intent)
+# ✅ Good
 age = user['age']
 # Only notify users 18+ due to GDPR requirements
 if age >= 18:
     send_email(user.email, subject="Important Update")
 ```
+
+### Advanced: Data Flow & API Design
+
+**Make data flow visible.** A reader should trace data through your code without jumping between files.
+
+```python
+# ❌ Bad — hidden data flow through mutation
+def process_order(order):
+    enrich_order(order)        # mutates order.metadata
+    validate_order(order)      # reads order.metadata, mutates order.errors
+    if not order.errors:
+        save_order(order)      # reads everything
+
+# ✅ Good — explicit data flow through return values
+def process_order(raw_order: RawOrder) -> ProcessedOrder:
+    enriched = enrich_order(raw_order)
+    validation = validate_order(enriched)
+    if not validation.errors:
+        return save_order(enriched)
+    raise ValidationError(validation.errors)
+```
+
+**Design APIs from the caller's perspective.** Write the calling code first, then implement.
+
+```python
+# ❌ Bad — designed from implementation out
+result = query_engine.execute(
+    QueryConfig(table="users", filters=[Filter("age", "gt", 18)],
+    projections=["name", "email"], limit=LimitConfig(count=10, offset=0))
+)
+
+# ✅ Good — designed from caller's needs in
+users = db.users.where(age__gt=18).select("name", "email").limit(10)
+```
+
+**Separate policy from mechanism.** Policy decides *what* to do. Mechanism does it.
+
+```python
+# ❌ Bad — policy and mechanism tangled
+def handle_payment(payment):
+    if payment.amount > 10000:
+        require_manager_approval(payment)
+        log_high_value_transaction(payment)
+    if payment.currency != "USD":
+        rate = fetch_exchange_rate(payment.currency)
+        payment.amount *= rate
+    charge_card(payment)
+
+# ✅ Good — policy is readable, mechanism is reusable
+def handle_payment(payment: Payment) -> ChargeResult:
+    payment = normalize_currency(payment, target="USD")
+    enforce_approval_policy(payment)
+    return charge_card(payment)
+```
+
+### Advanced: Abstraction Discipline
+
+**Earn your abstractions.** An abstraction is justified when it eliminates duplication across 3+ call sites, or when it captures a domain concept that makes the code more readable. Never create an abstraction for a single use site.
+
+```python
+# ❌ Bad — abstraction for single use
+class UserCreationStrategyFactory:
+    def create(self, source: str) -> UserCreationStrategy: ...
+
+# ✅ Good — just do the thing
+def create_user(name: str, email: str) -> User:
+    user = User(name=name, email=email)
+    db.save(user)
+    return user
+```
+
+**Keep abstractions at consistent levels.** A function should operate at one level of abstraction throughout.
+
+```python
+# ❌ Bad — mixed levels (high-level + low-level in same function)
+def deploy_application(config):
+    validate_config(config)                    # high-level
+    socket.connect((config.host, config.port)) # low-level
+    upload_artifacts(config.artifacts)          # high-level
+    os.chmod(f"/opt/{config.name}/run", 0o755) # low-level
+    start_service(config.name)                 # high-level
+
+# ✅ Good — one level throughout
+def deploy_application(config: DeployConfig) -> DeployResult:
+    validate_config(config)
+    establish_connection(config.host, config.port)
+    upload_artifacts(config.artifacts)
+    configure_permissions(config.name)
+    start_service(config.name)
+```
+
+### Advanced: Composition Over Configuration
+
+**Prefer small composable pieces over large configurable ones.**
+
+```python
+# ❌ Bad — god function with boolean flags
+def send_notification(user, message, urgent=False, retry=True,
+                      channel="email", template=None, cc=None):
+    ...
+
+# ✅ Good — compose behavior
+notification = (
+    Notification(user, message)
+    .via(Email(cc=manager))
+    .with_retry(max_attempts=3)
+    .urgent()
+)
+notification.send()
+```
+
+**Make illegal states unrepresentable.** Use the type system to prevent bugs at compile time.
+
+```python
+# ❌ Bad — states are implicit, can be inconsistent
+class Connection:
+    host: str
+    port: int
+    socket: Optional[Socket]  # None if disconnected
+    error: Optional[str]      # None if no error... or if not checked yet?
+
+# ✅ Good — each state is explicit
+@dataclass
+class Disconnected:
+    host: str
+    port: int
+
+@dataclass
+class Connected:
+    host: str
+    port: int
+    socket: Socket
+
+@dataclass
+class Failed:
+    host: str
+    port: int
+    error: str
+
+Connection = Disconnected | Connected | Failed
+```
+
+### The Taste Test
+
+Before delivering code, ask:
+1. **Can I read any function and understand it without reading other functions?**
+2. **If I change one requirement, how many files do I touch?** (Ideally: one)
+3. **Does the code structure mirror the problem structure?**
+4. **Would I be confused by this code 6 months from now?**
 
 ---
 
