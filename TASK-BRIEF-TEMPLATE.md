@@ -4,6 +4,19 @@
 
 ---
 
+## Task Type
+
+**Pick one:**
+
+- [ ] **Generate** — Build a new project from scratch
+- [ ] **Refactor** — Restructure existing code without changing behavior
+- [ ] **Debug** — Find and fix a specific bug
+- [ ] **Partial Rewrite** — Replace a module/component with a new implementation
+
+> **Why this matters:** Each mode uses a different prompt and checklist. Generate mode produces a full project. The other three modes work on existing code and have stricter scope controls. Pick the right mode, attach the matching prompt from `prompts/`.
+
+---
+
 ## Project
 
 **Name:** [Project Name]
@@ -15,12 +28,21 @@
 
 ## Problem Statement
 
-**What are we building?**
+**What are we building / fixing / improving?**
 
 [2-3 sentences explaining the core problem and solution]
 
-Example:
+Example (Generate):
 > We're building a GitHub issue triage system that uses Claude AI to automatically categorize issues, extract key details, and suggest labels. Users run it via CLI or API.
+
+Example (Refactor):
+> The `src/auth/` module has grown to 1200 lines with deep nesting and duplicated validation logic. Restructure into focused sub-modules (tokens, passwords, sessions) without changing the public API.
+
+Example (Debug):
+> `validate_email("user@")` returns `True` instead of raising `ValidationError`. This allows invalid emails to reach the database, causing downstream 500 errors in the notification service.
+
+Example (Partial Rewrite):
+> Replace the SQLite storage layer (`src/database/sqlite_store.py`) with PostgreSQL. The `Store` interface and all callers must continue working. Motivated by need for concurrent writes.
 
 ---
 
@@ -36,21 +58,6 @@ Example:
 **Nice to have:**
 - [ ] Optional feature A
 - [ ] Optional feature B
-
-Example:
-```
-**Must have:**
-- [ ] Read issues from GitHub API
-- [ ] Classify by priority (critical/major/minor)
-- [ ] Extract stakeholders from issue body
-- [ ] Generate summary in <100 words
-- [ ] Output as JSON or CLI formatted text
-
-**Nice to have:**
-- [ ] Batch processing (100+ issues at once)
-- [ ] Custom classification rules
-- [ ] Webhook integration
-```
 
 ### Non-Functional
 
@@ -68,14 +75,6 @@ Example:
 - **Compatibility:** [Python 3.10+, Node 18+, Rust 1.75+, Go 1.22+, C11/C17, C++17/C++20, etc.]
 - **Deployment:** [Local CLI / Docker / Serverless / API server]
 
-Example:
-```
-- No external databases (SQLite OK, PostgreSQL no)
-- Must use Claude API (not other LLMs)
-- No GitHub Premium features (free tier only)
-- Runnable on M1 Mac and Ubuntu 22.04
-```
-
 ---
 
 ## User Experience
@@ -83,33 +82,22 @@ Example:
 ### Input
 **How does a user interact with this?**
 
-Example:
 ```
 # CLI usage
-$ issue-triage --repo owner/repo --token gh_xxx
+$ my-tool --option value
 
 # API usage
-POST /api/triage
-{
-  "github_url": "https://github.com/owner/repo/issues/123",
-  "ai_model": "claude-opus"
-}
+POST /api/endpoint
+{ "key": "value" }
 ```
 
 ### Output
 **What does success look like?**
 
-Example:
-```
+```json
 {
-  "issue_id": 123,
-  "title": "Login fails with special characters",
-  "priority": "major",
-  "category": "bug",
-  "stakeholders": ["@alice", "@bob"],
-  "summary": "Users with @ or & in password cannot login. Affects 5% of users.",
-  "suggested_labels": ["bug", "authentication", "urgent"],
-  "effort_estimate": "2h"
+  "status": "success",
+  "data": {}
 }
 ```
 
@@ -119,33 +107,94 @@ Example:
 
 **If you have strong opinions, specify them. If not, Claude Code decides.**
 
-Example:
+---
+
+## Existing Code Context (For Refactor / Debug / Partial Rewrite)
+
+> **Skip this section for Generate tasks.** For all other task types, this is essential.
+
+### Codebase Location
+
+**Repository:** [URL or local path]
+**Branch:** [branch name]
+**Files in scope:** [list specific files/modules to work on]
+
+### Current State
+
+**What works:** [describe what's currently functioning]
+**What's broken/problematic:** [describe the specific issue]
+**Related tests:** [list test files that cover this code]
+
+### Existing Test Suite
+
+```bash
+# How to run existing tests
+make test                    # or: npm test, cargo test, go test ./...
+
+# Current test status
+# [N] passing, [N] failing, [coverage]%
 ```
-Preferred architecture:
-- CLI: Python click framework
-- Core logic: Pure functions, no state
-- API: FastAPI with pydantic models
-- Testing: pytest with fixtures
-- Error handling: Custom exception classes
+
+### Code Samples (If Relevant)
+
+```
+# Paste the specific function, class, or module that needs work.
+# Include enough context for Claude to understand the surrounding code.
 ```
 
 ---
 
-## Example Code or Reference
+## Bug Report (For Debug Tasks Only)
 
-**If you have existing code or libraries to work with:**
+> **Skip this section unless task type is Debug.**
 
-```python
-# Use Claude AI like this:
-from anthropic import Anthropic
+### Observed Behavior
+[What happens now — be specific]
 
-client = Anthropic()
-response = client.messages.create(
-    model="claude-opus-4-1-20250805",
-    max_tokens=1024,
-    messages=[...],
-)
+### Expected Behavior
+[What should happen instead]
+
+### Reproduction Steps
+```bash
+# Exact steps to trigger the bug
+1. ...
+2. ...
+3. Observe: [error message or wrong behavior]
 ```
+
+### Error Output
+```
+# Paste the full error message, stack trace, or wrong output
+```
+
+### Environment
+- OS: [e.g., Ubuntu 22.04, macOS 14]
+- Language version: [e.g., Python 3.12, Node 20]
+- Relevant dependency versions: [e.g., FastAPI 0.110, React 18.3]
+
+---
+
+## Rewrite Scope (For Partial Rewrite Tasks Only)
+
+> **Skip this section unless task type is Partial Rewrite.**
+
+### What's Being Replaced
+[Module/component name and file paths]
+
+### Why Not Refactor?
+[Explain why incremental refactoring isn't sufficient]
+
+### New Technology/Approach
+[What replaces the old implementation — new library, pattern, architecture]
+
+### Must Preserve
+- [ ] Public API: [list functions/endpoints that callers depend on]
+- [ ] Error types: [list error classes/codes that callers handle]
+- [ ] Configuration: [list env vars or config keys the module reads]
+
+### Acceptable Breaking Changes
+- [ ] [List any API changes you're willing to accept, if any]
+- [ ] [Or: "None — zero breaking changes"]
 
 ---
 
@@ -153,13 +202,36 @@ response = client.messages.create(
 
 **The code is done when:**
 
-- [ ] All functional requirements working
+### All Task Types
 - [ ] Tests pass with ≥80% coverage
+- [ ] Zero lint/type warnings
+- [ ] Error handling is explicit (no silent failures)
+- [ ] Code is readable and well-documented
+
+### Generate Only
+- [ ] All functional requirements working
 - [ ] Setup script works (`setup.sh && make test`)
 - [ ] README has working examples
 - [ ] No console errors or warnings
-- [ ] Code is readable and well-documented
-- [ ] Error handling is explicit (no silent failures)
+
+### Refactor Only
+- [ ] All existing tests pass unchanged
+- [ ] Public API unchanged
+- [ ] Coverage maintained or improved
+- [ ] REFACTOR-PLAN included
+
+### Debug Only
+- [ ] Regression test exists (fails before fix, passes after)
+- [ ] Root cause documented
+- [ ] Minimal fix (fewest lines changed)
+- [ ] DEBUG-REPORT included
+
+### Partial Rewrite Only
+- [ ] All callers of rewritten module work
+- [ ] Migration guide provided (if API changed)
+- [ ] New tests cover rewritten module
+- [ ] REWRITE-PLAN included
+- [ ] Rollback path documented
 
 ---
 
@@ -167,19 +239,10 @@ response = client.messages.create(
 
 **What might come up?**
 
-Example:
 ```
-- Q: How do we handle rate limits from GitHub API?
-- A: Exponential backoff, max 3 retries, then error
-  
-- Q: What if Claude API is down?
-- A: Return cached result if available, otherwise error
-  
-- Q: Should we support private repos?
-- A: Yes, if user provides valid token
+- Q: [Question about ambiguity]
+- A: [Your decision or preference]
 ```
-
----
 
 ---
 
@@ -187,15 +250,17 @@ Example:
 
 [Any additional context, preferences, or gotchas]
 
-Example:
-```
-- This will eventually be open-sourced, so clean code matters
-- The team uses VSCode + Copilot, so type hints are critical
-- We'll run this on GitHub Actions, so it needs to be deterministic
-```
-
 ---
 
 ## Ready to Start?
 
-Copy this template, fill it out, and give it to Claude along with `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, and `prompts/PROMPT-CLAUDE-CODE-MASTER.md`. See README.md for how to do this with the CLI, web, or API.
+Copy this template, fill it out, and give it to Claude along with the appropriate files:
+
+| Task Type | Attach These Files |
+|---|---|
+| **Generate** | `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `prompts/PROMPT-CLAUDE-CODE-MASTER.md`, `TASK-BRIEF.md` |
+| **Refactor** | `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `prompts/PROMPT-REFACTOR.md`, `TASK-BRIEF.md` |
+| **Debug** | `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `prompts/PROMPT-DEBUG.md`, `TASK-BRIEF.md` |
+| **Partial Rewrite** | `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `prompts/PROMPT-PARTIAL-REWRITE.md`, `TASK-BRIEF.md` |
+
+See `README.md` for how to do this with the CLI, web, or API.

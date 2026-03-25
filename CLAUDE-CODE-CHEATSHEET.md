@@ -7,29 +7,99 @@
 ## TL;DR Formula
 
 ```
-Specific TASK-BRIEF + CLAUDE-CODE-CONTRACT.md + PROMPT-CLAUDE-CODE-MASTER.md
+TASK-BRIEF (with task type) + CONTRACT + matching PROMPT
 = Production-ready code, first try
 ```
 
+| Task Type | Prompt to Attach |
+|---|---|
+| **Generate** (new project) | `prompts/PROMPT-CLAUDE-CODE-MASTER.md` |
+| **Refactor** (restructure) | `prompts/PROMPT-REFACTOR.md` |
+| **Debug** (fix bug) | `prompts/PROMPT-DEBUG.md` |
+| **Partial Rewrite** (replace module) | `prompts/PROMPT-PARTIAL-REWRITE.md` |
+
 ---
 
-## 1. Quick TASK-BRIEF (2 min)
+## 1. Quick TASK-BRIEFs (2 min each)
+
+### Generate (New Project)
 
 ```markdown
 # TASK-BRIEF: [Project]
 
+**Task Type:** Generate
 **Name:** [name]
 **Language:** Python / TypeScript / Go / Rust / C / C++
 **Problem:** [1 sentence describing what you're building]
 
 **Must have:**
 - [ ] Feature A
-- [ ] Feature B  
+- [ ] Feature B
 - [ ] Feature C
 
 **Success:** Tests pass (≥80%), setup works first try, README has examples
-
 **Constraints:** [Any limits or dependencies]
+```
+
+### Refactor (Existing Code)
+
+```markdown
+# TASK-BRIEF: Refactor [module]
+
+**Task Type:** Refactor
+**Language:** [language]
+**Files in scope:** [list files/modules to restructure]
+
+**Problem:** [what's wrong with the current structure]
+**Goal:** [what the code should look like after]
+
+**Constraints:**
+- Existing tests must pass unchanged
+- Public API must not change
+- No bug fixes mixed in
+
+**Success:** Same behavior, cleaner code, tests still green
+```
+
+### Debug (Fix a Bug)
+
+```markdown
+# TASK-BRIEF: Fix [bug description]
+
+**Task Type:** Debug
+**Language:** [language]
+**Broken function/module:** [file:function]
+
+**Bug:** [what happens vs what should happen]
+**Reproduction:** [exact steps or input to trigger it]
+**Error output:** [paste error message/stack trace]
+
+**Constraints:**
+- Minimal fix only
+- Must include regression test
+- No refactoring
+
+**Success:** Regression test passes, all existing tests pass, root cause documented
+```
+
+### Partial Rewrite (Replace Module)
+
+```markdown
+# TASK-BRIEF: Rewrite [module]
+
+**Task Type:** Partial Rewrite
+**Language:** [language]
+**Module to replace:** [file paths]
+**Replace with:** [new technology/approach]
+
+**Why not refactor:** [why incremental changes aren't enough]
+
+**Must preserve:**
+- [ ] [Public function A]
+- [ ] [Public function B]
+- [ ] [Error types X, Y]
+
+**Success:** Callers unchanged, new tests pass, migration guide if API changed
 ```
 
 That's it. Claude Code handles the rest.
@@ -43,23 +113,43 @@ That's it. Claude Code handles the rest.
 ```bash
 cd ~/my-project
 claude --add-dir /path/to/claude-code-contracts
-
-# Inside the session, reference contract files with @ and type your prompt:
-> @/path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md @/path/to/claude-code-contracts/CODING-CONTEXT.md @/path/to/claude-code-contracts/prompts/PROMPT-CLAUDE-CODE-MASTER.md @TASK-BRIEF.md Generate production code following the contract and task brief.
 ```
+
+Then reference the **right prompt for your task type:**
+
+```bash
+# Generate (new project)
+> @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-CLAUDE-CODE-MASTER.md @TASK-BRIEF.md
+  Generate production code following the contract and task brief.
+
+# Refactor (restructure existing code)
+> @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-REFACTOR.md @TASK-BRIEF.md
+  Refactor the code following the contract and task brief.
+
+# Debug (fix a bug)
+> @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-DEBUG.md @TASK-BRIEF.md
+  Debug and fix the issue following the contract and task brief.
+
+# Partial Rewrite (replace a module)
+> @CONTRACT.md @CODING-CONTEXT.md @prompts/PROMPT-PARTIAL-REWRITE.md @TASK-BRIEF.md
+  Rewrite the module following the contract and task brief.
+```
+
+(Use full paths like `@/path/to/claude-code-contracts/CLAUDE-CODE-CONTRACT.md` if not using `--add-dir`)
 
 ### One-shot (pipe mode)
 
 ```bash
-cat CLAUDE-CODE-CONTRACT.md CODING-CONTEXT.md prompts/PROMPT-CLAUDE-CODE-MASTER.md TASK-BRIEF.md \
-  | claude --print "Generate production code following the attached contract and task brief."
+# Adjust the prompt file for your task type
+cat CLAUDE-CODE-CONTRACT.md CODING-CONTEXT.md prompts/PROMPT-DEBUG.md TASK-BRIEF.md \
+  | claude --print "Debug and fix the issue following the attached contract and task brief."
 ```
 
 ### Claude.ai (web)
 
 1. Start a new conversation
-2. Attach: `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `TASK-BRIEF.md`, `prompts/PROMPT-CLAUDE-CODE-MASTER.md`
-3. Type: *"Generate production code following CLAUDE-CODE-CONTRACT.md and TASK-BRIEF.md"*
+2. Attach: `CLAUDE-CODE-CONTRACT.md`, `CODING-CONTEXT.md`, `TASK-BRIEF.md`, and the **matching prompt file**
+3. Type your request matching the task type
 
 ---
 
@@ -127,18 +217,34 @@ If all green → **Done. Ship it.**
 
 Don't accept broken code. Request specific fix:
 
+### Generate Mode
 ```
 ❌ "The code has bugs"
-✅ "The fetch_user() function is missing error handling for DatabaseError. 
+✅ "The fetch_user() function is missing error handling for DatabaseError.
     Regenerate src/api.py with explicit try/except for all database calls."
+```
 
-❌ "Tests don't work"
-✅ "Test coverage is 73%, contract requires ≥80%. 
-    Add integration tests for error conditions in tests/integration/."
+### Refactor Mode
+```
+❌ "The refactoring broke something"
+✅ "test_validate_email fails after refactoring. The function now returns
+    lowercase but callers expect original case. Revert the behavior change
+    — refactor structure only, not behavior."
+```
 
-❌ "It's not type hinted"
-✅ "function validate_email() on line 47 of src/validators.py is missing 
-    return type hint. Regenerate src/validators.py with 100% type coverage."
+### Debug Mode
+```
+❌ "Your fix is too big"
+✅ "Lines 45-78 are cosmetic changes unrelated to the bug. Keep only the
+    fix on line 52 and the regression test. Remove all other changes."
+```
+
+### Partial Rewrite Mode
+```
+❌ "Callers are broken"
+✅ "fetch_user() now raises NotFoundError but callers in src/api/handlers.py
+    check for None. Either preserve the old return type or update all 3 callers
+    and add a migration guide."
 ```
 
 Be specific. Rerun with the exact issue stated.
