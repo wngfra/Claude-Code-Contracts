@@ -2,52 +2,60 @@
 
 **Self-contained production contract system for Claude Code.**
 
-Version: 1.0  
-Status: Production Ready  
+Version: 2.0
+Status: Production Ready
 Last Updated: March 2026
+Languages: Python, TypeScript, Rust, Go, C/C++, Bash
 
 ---
 
-## 📦 Contents (8 Files, ~60 KB)
+## Contents (11 Files, ~100 KB)
 
 ### Entry Points
-- **START-HERE.md** (4.6 KB) — Quick 2-min overview, read this first
-- **README.md** (9.2 KB) — Full system overview, file guide
+- **START-HERE.md** — Quick 2-min overview, read this first
+- **README.md** — Full system overview, file guide
 
 ### Core Contracts
-- **CLAUDE-CODE-CONTRACT.md** (12.3 KB) — Quality standards document
-- **PROMPT-CLAUDE-CODE-MASTER.md** (9 KB) — Master prompt (in `prompts/`)
+- **CLAUDE-CODE-CONTRACT.md** — Quality standards document (authoritative)
+- **PROMPT-CLAUDE-CODE-MASTER.md** — Master prompt (in `prompts/`)
 
 ### Guides & References
-- **CLAUDE-CODE-GUIDE.md** (12.1 KB) — Complete how-to with examples
-- **CLAUDE-CODE-CHEATSHEET.md** (11.2 KB) — Quick copy-paste reference
-- **TASK-BRIEF-TEMPLATE.md** (4.8 KB) — Copy for each project
+- **CLAUDE-CODE-GUIDE.md** — Complete how-to with examples
+- **CLAUDE-CODE-CHEATSHEET.md** — Quick copy-paste reference
+- **TASK-BRIEF-TEMPLATE.md** — Copy for each project
 
 ### Standards
-- **CODING-CONTEXT.md** (4.3 KB) — Language-specific rules
+- **CODING-CONTEXT.md** — Language-specific rules
 
-### This File
-- **MANIFEST.md** — Index of everything
+### Meta
+- **MANIFEST.md** — This file, index of everything
+- **DELIVERY-SUMMARY.md** — Delivery overview
+- **FILE-STRUCTURE.txt** — ASCII directory tree
 
 ---
 
-## 🎯 What This System Does
+## What This System Does
 
 Ensures Claude Code generates production-grade code, every time:
-- ✅ 100% type hints (no `any` types)
-- ✅ ≥80% test coverage (all tests pass)
-- ✅ Zero TODOs (complete, shipping code)
-- ✅ Zero linting warnings
-- ✅ Zero type errors
-- ✅ Working setup script
-- ✅ Accurate README with examples
-- ✅ Git-ready (commit immediately)
+- 100% type hints (no `any` types)
+- >=80% test coverage (all tests pass)
+- Benchmarks for hot paths
+- Zero TODOs (complete, shipping code)
+- Zero linting warnings
+- Zero type errors
+- Security audit clean
+- CI configuration included
+- Working setup script
+- Comprehensive README with tested examples (per README Generation Spec)
+- CHANGELOG in Keep a Changelog format
+- README + CHANGELOG always synced with code changes
+- Git-ready (commit immediately)
 
 **No iteration needed. One-shot, ship-ready.**
 
 ---
 
-## 🚀 How to Use
+## How to Use
 
 ### Minimal (5 minutes)
 ```
@@ -60,7 +68,7 @@ Ensures Claude Code generates production-grade code, every time:
    - TASK-BRIEF.md (your project)
    - prompts/PROMPT-CLAUDE-CODE-MASTER.md
 5. Ask: "Generate production code following CLAUDE-CODE-CONTRACT.md"
-6. Verify: make test && make lint && git status
+6. Verify: make test && make lint && make bench && git status
 7. Ship
 ```
 
@@ -71,29 +79,31 @@ Ensures Claude Code generates production-grade code, every time:
 3. Read CLAUDE-CODE-CHEATSHEET.md (5 min)
 4. Copy TASK-BRIEF-TEMPLATE.md
 5. Fill with project details
-6. Attach & spawn Claude Code
+6. Attach & generate with Claude Code
 7. Verify & ship
 ```
 
 ---
 
-## 📖 File Guide
+## File Guide
 
-| File | Purpose | Size | Read When |
-|---|---|---|---|
-| **START-HERE.md** | Entry point, quick overview | 4.6 KB | **First** |
-| **README.md** | System overview, file guide | 9.2 KB | Planning |
-| **CLAUDE-CODE-GUIDE.md** | Complete walkthrough, examples | 12.1 KB | First project |
-| **CLAUDE-CODE-CONTRACT.md** | Quality standards, requirements | 12.3 KB | Reviewing code |
-| **CLAUDE-CODE-CHEATSHEET.md** | Quick reference, templates | 11.2 KB | During project |
-| **PROMPT-CLAUDE-CODE-MASTER.md** | Master prompt for Claude Code | 9 KB | Customizing |
-| **TASK-BRIEF-TEMPLATE.md** | Copy for each project | 4.8 KB | Starting project |
-| **CODING-CONTEXT.md** | Language-specific rules | 4.3 KB | Customizing |
-| **MANIFEST.md** | This file, index | — | Navigation |
+| File | Purpose | Read When |
+|---|---|---|
+| **START-HERE.md** | Entry point, quick overview | **First** |
+| **README.md** | System overview, file guide | Planning |
+| **CLAUDE-CODE-GUIDE.md** | Complete walkthrough, examples | First project |
+| **CLAUDE-CODE-CONTRACT.md** | Quality standards, requirements | Reviewing code |
+| **CLAUDE-CODE-CHEATSHEET.md** | Quick reference, templates | During project |
+| **PROMPT-CLAUDE-CODE-MASTER.md** | Master prompt for Claude Code | Customizing |
+| **TASK-BRIEF-TEMPLATE.md** | Copy for each project | Starting project |
+| **CODING-CONTEXT.md** | Language-specific rules | Customizing |
+| **MANIFEST.md** | This file, index | Navigation |
+| **DELIVERY-SUMMARY.md** | Delivery overview | Understanding scope |
+| **FILE-STRUCTURE.txt** | ASCII tree reference | Quick reference |
 
 ---
 
-## 🎓 Reading Paths
+## Reading Paths
 
 ### Path 1: I Want to Use This Right Now
 1. START-HERE.md (2 min)
@@ -122,151 +132,122 @@ Ensures Claude Code generates production-grade code, every time:
 
 ---
 
-## ✅ Quality Standards (Non-Negotiable)
+## Quality Standards (Non-Negotiable)
 
 Every Claude Code project must deliver:
 
 ```
-☑ Type Hints: 100% on public APIs
-☑ Tests: ≥80% coverage, all pass, no skips
-☑ Code: Zero TODOs, zero stubs
-☑ Linting: Zero warnings, zero errors
-☑ Types: Type checking passes (mypy/tsc)
-☑ Setup: Works first time (setup.sh && make test)
-☑ Docs: README accurate, examples tested
-☑ Errors: Explicit handling, never silent failures
-☑ Config: .env.example complete, no secrets
-☑ Git: Ready to commit immediately
+Type Hints: 100% on public APIs
+Tests: >=80% coverage, all pass, no skips
+Benchmarks: present for hot paths
+Code: Zero TODOs, zero stubs
+Linting: Zero warnings, zero errors
+Types: Type checking passes (mypy/tsc/clippy)
+Security: Audit clean, no secrets in code
+CI: Configuration present
+Setup: Works first time (setup.sh && make test)
+README: Complete (all sections per spec), examples tested
+CHANGELOG: Present, all changes documented (Keep a Changelog format)
+Doc Sync: README + CHANGELOG match current code state
+Errors: Explicit handling, never silent failures
+Config: .env.example complete, no secrets
+Git: Ready to commit immediately
 ```
 
 **Code violating any standard is rejected until fixed.**
 
 ---
 
-## 🛠️ How to Apply
+## Supported Languages
 
-### To a Web API Project
-```bash
-# 1. Fill TASK-BRIEF.md with:
-#    - Framework: Express / FastAPI / Fastify
-#    - Endpoints: /api/users, /api/posts
-#    - Authentication: JWT / OAuth
-#    - Database: PostgreSQL / SQLite
-
-# 2. Attach contracts & spawn Claude Code
-
-# 3. Get back:
-#    - Express/FastAPI server
-#    - Models & schemas
-#    - Error handling
-#    - Tests (unit + integration)
-#    - Setup script & Makefile
-#    - Working README
-```
-
-### To a CLI Tool
-```bash
-# 1. Fill TASK-BRIEF.md with:
-#    - Language: Python / TypeScript / Go
-#    - Commands: triage, report, sync
-#    - Input/Output format
-#    - Error handling
-
-# 2. Attach & spawn
-
-# 3. Get back:
-#    - Full CLI implementation
-#    - Argument parsing
-#    - Error handling
-#    - Tests
-#    - Setup script
-```
-
-### To a Library
-```bash
-# 1. Fill TASK-BRIEF.md with:
-#    - Core functions
-#    - Data structures
-#    - Edge cases to handle
-#    - Public API
-
-# 2. Attach & spawn
-
-# 3. Get back:
-#    - Library code (100% typed)
-#    - Tests
-#    - API documentation
-#    - Examples
-```
+| Language | Type System | Testing | Linting | Logging | Benchmarks |
+|---|---|---|---|---|---|
+| **Python** | mypy --strict | pytest --cov | ruff + black | structlog | pytest-benchmark |
+| **TypeScript** | tsc --noEmit | vitest --coverage | eslint + prettier | pino | vitest bench |
+| **Rust** | cargo clippy -D | cargo test | clippy + rustfmt | tracing | criterion |
+| **Go** | go vet | go test -race | go vet + staticcheck | slog | go test -bench |
+| **C/C++** | -Wall -Wextra -Werror | gtest | clang-tidy | spdlog | google benchmark |
+| **Bash** | — | bats | shellcheck | — | — |
 
 ---
 
-## 🚫 What Gets Rejected
+## What Gets Rejected
 
 Code that has:
 - TODOs or incomplete sections
 - Missing type hints (even one function)
 - Test coverage < 80%
+- No benchmarks for hot paths
 - Failing or skipped tests
 - Linting warnings
 - Type checking errors
+- Security audit failures
+- No CI configuration
+- Unsafe code without justification
 - Broken setup script
-- Non-working README examples
+- Non-working README examples or missing README sections
+- Missing or stale CHANGELOG.md
+- Code changes without corresponding doc updates
 - Secrets in code
 
 **Request specific fix and rerun.**
 
 ---
 
-## 🎁 Package Contents
+## Package Contents
 
 ```
 claude-code-contracts/
-├── README.md                          Main overview
+├── README.md                          System overview
 ├── START-HERE.md                      Quick start
 ├── MANIFEST.md                        This file
+├── DELIVERY-SUMMARY.md                Delivery overview
+├── FILE-STRUCTURE.txt                 ASCII tree reference
 │
-├── CLAUDE-CODE-CONTRACT.md            Standards (12.3 KB)
-├── CLAUDE-CODE-GUIDE.md               How-to (12.1 KB)
-├── CLAUDE-CODE-CHEATSHEET.md          Quick ref (11.2 KB)
-├── TASK-BRIEF-TEMPLATE.md             Template (4.8 KB)
-├── CODING-CONTEXT.md                  Language rules (4.3 KB)
+├── CLAUDE-CODE-CONTRACT.md            Quality standards (authoritative)
+├── CLAUDE-CODE-GUIDE.md               Complete how-to
+├── CLAUDE-CODE-CHEATSHEET.md          Quick reference
+├── TASK-BRIEF-TEMPLATE.md             Project template
+├── CODING-CONTEXT.md                  Language rules
 │
 └── prompts/
-    └── PROMPT-CLAUDE-CODE-MASTER.md   Master prompt (9 KB)
+    └── PROMPT-CLAUDE-CODE-MASTER.md   Master prompt
 
-Total: ~60 KB, self-contained, no dependencies
+Total: ~100 KB, self-contained, no dependencies
 ```
 
 ---
 
-## 💡 Key Principles
+## Key Principles
 
 1. **One-shot, no iteration** — Code ships on first generation
 2. **Quality non-negotiable** — Standards are enforced, not suggested
-3. **Clear contracts** — No ambiguity about what's expected
-4. **Portable** — Works with any Claude Code interface
-5. **Customizable** — Adapt for your needs
-6. **Complete** — Everything included (tests, docs, setup)
+3. **Performance measurable** — Benchmarks required for hot paths
+4. **Security by default** — Validation at boundaries, audit clean
+5. **Clear contracts** — No ambiguity about what's expected
+6. **Multi-language** — Full support for Python, TS, Rust, Go, C/C++
+7. **CI-ready** — Workflows generated per language
+8. **Portable** — Works with any Claude Code interface
+9. **Customizable** — Adapt for your needs
+10. **Complete** — Everything included (tests, benchmarks, docs, setup, CI)
 
 ---
 
-## 🤝 Compatible With
+## Compatible With
 
 - Claude.ai web interface
-- Copilot IDE extensions
+- IDE extensions
 - Claude API
 - Any LLM accepting Claude as model
-- OpenAI APIs (same contract system)
 
 **Just attach files and use the prompts provided.**
 
 ---
 
-## 📊 System Overview
+## System Overview
 
 ```
-Your Project Requirements
+Your Requirements + Performance Budget
         ↓
 Fill TASK-BRIEF.md
         ↓
@@ -275,105 +256,67 @@ Attach Contract Files to Claude Code
 Claude Code Reads Contract
         ↓
 Generates Production Code:
-  ✓ 100% type hints
-  ✓ 80%+ tests
-  ✓ Zero TODOs
-  ✓ Working setup
+  - 100% type hints
+  - >=80% tests
+  - Benchmarks
+  - Zero TODOs
+  - Security clean
+  - CI configured
+  - Working setup
         ↓
-You Verify (make test, make lint)
+You Verify (make test, make lint, make bench)
         ↓
 Ship (git commit immediately)
 ```
 
 ---
 
-## ✨ What Makes This Different
+## What Makes This Different
 
 ### Before (No Contract)
 - Claude Code generates incomplete code
-- Missing type hints, tests, documentation
+- Missing type hints, tests, benchmarks, documentation
 - Requires iteration to fix
 - Manual quality checks
 - Unpredictable quality
 
 ### After (With Contract)
 - Claude Code reads contract upfront
-- Knows exact requirements
-- Generates complete code
+- Knows exact requirements per language
+- Generates complete code with benchmarks
 - All standards met automatically
 - Predictable quality
 - No iteration needed
 
 ---
 
-## 🚀 Getting Started Right Now
-
-**Option 1: This Minute (5 min)**
-```bash
-1. Open START-HERE.md
-2. Follow 5-step quick start
-3. Done
-```
-
-**Option 2: Properly (30 min)**
-```bash
-1. Read README.md
-2. Read CLAUDE-CODE-GUIDE.md
-3. Read CLAUDE-CODE-CHEATSHEET.md
-4. Create your first project
-```
-
-**Option 3: Reference Needed Later**
-```bash
-1. Bookmark CLAUDE-CODE-CHEATSHEET.md
-2. Bookmark CODING-CONTEXT.md
-3. Keep TASK-BRIEF-TEMPLATE.md handy
-```
-
----
-
-## 📞 Support
-
-### "How do I use this?"
-→ Read START-HERE.md
-
-### "What are the quality standards?"
-→ Read CLAUDE-CODE-CONTRACT.md
-
-### "Can I customize it?"
-→ Edit CODING-CONTEXT.md
-
-### "What language does it support?"
-→ Check CODING-CONTEXT.md (Python/TypeScript/Go, more available)
-
-### "How do I reject bad code?"
-→ See CLAUDE-CODE-GUIDE.md section on rejection protocol
-
----
-
-## 📋 Quick Checklist
+## Quick Checklist
 
 Before using with Claude Code:
 - [ ] Read START-HERE.md
-- [ ] Have all 8 files in this folder
+- [ ] Have all files in this folder
 - [ ] Understand the quality standards
 - [ ] Know how to fill TASK-BRIEF.md
 - [ ] Know how to attach files to Claude Code
 - [ ] Understand rejection protocol
 
 Before shipping generated code:
-- [ ] `make test` passes with ≥80% coverage
+- [ ] `make test` passes with >=80% coverage
 - [ ] `make lint` shows zero warnings
+- [ ] `make bench` benchmarks run (if applicable)
 - [ ] `git status` shows ready to commit
-- [ ] README examples actually work
-- [ ] ./setup.sh worked on fresh machine
+- [ ] README has all required sections and examples actually work
+- [ ] CHANGELOG.md present with all changes documented
+- [ ] README and CHANGELOG synced with current code
+- [ ] `./setup.sh` worked on fresh machine
 - [ ] No TODOs in code
 - [ ] No type hints missing
 - [ ] All tests passing (no skips)
+- [ ] CI workflow present
 
 ---
 
-## 🎯 Success Metrics
+## Success Metrics
 
 **You've won if:**
 - Generated code passes all checks first try
@@ -384,43 +327,22 @@ Before shipping generated code:
 
 ---
 
-## 📝 File Dependencies
+## File Dependencies
 
 ```
-START-HERE.md ← Read this first
+START-HERE.md <- Read this first
         ↓
-CLAUDE-CODE-GUIDE.md ← Complete walkthrough
+CLAUDE-CODE-GUIDE.md <- Complete walkthrough
         ↓
-All other files reference CLAUDE-CODE-CONTRACT.md standards
+All files reference CLAUDE-CODE-CONTRACT.md standards
         ↓
-TASK-BRIEF-TEMPLATE.md ← Copy for your project
+TASK-BRIEF-TEMPLATE.md <- Copy for your project
         ↓
-PROMPT-CLAUDE-CODE-MASTER.md ← Attach with contract
+PROMPT-CLAUDE-CODE-MASTER.md <- Attach with contract
         ↓
-CODING-CONTEXT.md ← Customize as needed
+CODING-CONTEXT.md <- Customize as needed
 ```
 
 ---
 
-## 🏁 Final Notes
-
-- **No external dependencies** — All files are self-contained
-- **No licensing restrictions** — Use freely for any project
-- **Open for modification** — Customize for your needs
-- **Proven system** — Used in production for multiple projects
-- **Always improving** — Update CODING-CONTEXT.md as you learn
-
----
-
-## 🎓 Examples Included
-
-- Weather API (TypeScript/Express)
-- GitHub Issue Triage (Python/FastAPI)
-- Slack Bot (Python/Flask)
-- CLI tools, libraries, scripts
-
-See CLAUDE-CODE-GUIDE.md and CLAUDE-CODE-CHEATSHEET.md for examples.
-
----
-
-**Ready to build?** Start with **START-HERE.md** →
+**Ready to build?** Start with **START-HERE.md.**

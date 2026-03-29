@@ -1,111 +1,194 @@
-# CODING_CONTEXT.md - Persistent Code Context
+# CODING-CONTEXT.md — Language & Environment Rules
+
+**This file is your persistent context. Edit it to match your stack and preferences.**
+
+---
 
 ## Tech Stack
 
-- **Languages:** Python, TypeScript, Bash, Go (primary)
-- **Build:** uv, npm, cargo
-- **Testing:** pytest, vitest, go test
-- **Linting:** ruff, eslint, gofmt
+- **Languages:** Python, TypeScript, Rust, Go, C/C++
+- **Build:** uv, npm, cargo, go, cmake
+- **Testing:** pytest, vitest, cargo test, go test, Google Test
+- **Linting:** ruff, eslint, clippy, go vet, clang-tidy
 
-## Coding Standards
+## Coding Standards Quick Reference
 
-- **Python:** Type hints required, Black formatting, 120 char lines
-- **TypeScript:** Strict mode, 4-space indent, ESLint strict
-- **Bash:** ShellCheck passing, set -euo pipefail
-- **Error handling:** Explicit, no silent failures
+| Language | Formatter | Linter | Type Check | Test | Benchmark |
+|---|---|---|---|---|---|
+| **Python** | black | ruff | mypy (strict) | pytest --cov | pytest-benchmark |
+| **TypeScript** | prettier | eslint | tsc --noEmit | vitest --coverage | vitest bench |
+| **Rust** | rustfmt | clippy (-D warnings) | cargo check | cargo test | cargo bench (criterion) |
+| **Go** | gofmt | go vet + staticcheck | go build | go test -race -cover | go test -bench |
+| **C/C++** | clang-format | clang-tidy | compiler warnings | gtest | google benchmark |
 
-## Project Structure
+## Language-Specific Rules
 
-```
-workspace/
-├── skills/           # Agent skills (build123d-cad, etc.)
-├── cad-scripts/      # CAD generation scripts
-├── cad-output/       # Generated STEP/STL files
-└── openclaw-configs/ # Config backup from git
-```
+### Python
+- Type hints: 100% on public APIs, `strict = true` in mypy config
+- Formatting: black (100 char lines), isort (3 groups)
+- Error handling: Custom exception hierarchy inheriting from `ApplicationError`
+- Logging: `structlog` preferred, `logging` fallback
+- Dependencies: `pyproject.toml` with pinned ranges, `uv` for management
+- Minimum version: Python 3.11+
 
-## Common Patterns
+### TypeScript
+- Strict mode enabled — zero `any` types
+- Formatting: Prettier (2-space indent, semicolons, double quotes)
+- Error handling: Custom error classes extending `AppError`
+- Logging: `pino` with structured JSON output
+- Dependencies: `package.json` with exact or caret ranges, lockfile committed
+- Minimum version: Node 18+
 
-### API/Web
-- Error status codes: 200/201 success, 400 bad input, 404 not found, 500 server error
-- Response format: `{ "success": bool, "data": T, "error": string }`
-- Rate limiting: Respect 429/Retry-After headers
+### Rust
+- Edition: 2021 minimum, MSRV documented in Cargo.toml
+- Clippy: `#![deny(clippy::all, clippy::pedantic)]` — zero warnings
+- Error handling: `thiserror` for library errors, `anyhow` for application errors
+- Logging: `tracing` with structured spans
+- Unsafe: Forbidden without `// SAFETY:` justification and minimized scope
+- Async: `tokio` runtime, document `Send + Sync` bounds
+- Dependencies: Cargo.lock committed
 
-### File Operations
-- Use `trash` for deletions (recoverable)
-- Always preserve backups before destructive ops
-- Generated files → `/cad-output/`, `/workspace/`
+### Go
+- Version: 1.22+ (take advantage of range-over-int, improved stdlib)
+- Formatting: Standard gofmt (tabs, enforced by toolchain)
+- Error handling: `error` interface, `%w` wrapping, sentinel errors (`ErrXxx`)
+- Logging: `log/slog` (stdlib, structured)
+- Race detection: `go test -race` always in CI
+- Interfaces: Define at consumer, keep small (1-3 methods)
+- No underscores in names (except test files and cgo)
 
-### Shell Scripting
-- Prefer `exec` with `yieldMs` for long operations
-- Spawn subagents for iterative work
-- Log output to files, not just console
+### C/C++
+- Standard: C++20 minimum (use `std::expected`, `std::span`, concepts)
+- Build: CMake 3.20+, Ninja generator preferred
+- Memory: RAII only, no raw `new`/`delete` in application code
+- Smart pointers: `std::unique_ptr` by default, `std::shared_ptr` only when ownership is truly shared
+- Const correctness: Everything `const` by default
+- Sanitizers: AddressSanitizer + UndefinedBehaviorSanitizer in Debug builds
+- Testing: Google Test + Google Benchmark
+- Formatting: clang-format (Google style or project-specific .clang-format)
+- Linting: clang-tidy enabled
+- Header guards: `#pragma once`
+
+### Bash
+- ShellCheck passing
+- `set -euo pipefail` at top of every script
+- Quote all variables: `"$var"` not `$var`
+- Use `[[ ]]` over `[ ]`
+- Functions over inline scripts for anything >20 lines
+
+---
 
 ## Build Commands (Quick Reference)
 
-| Task | Command |
-|------|---------|
-| Run Python | `python3 script.py` or `.venv/bin/python` |
-| Node project | `npm run dev` or `npm test` |
-| Rust/Go | `cargo run` or `go run ./...` |
-| Type check | `pyright` or `tsc --noEmit` |
-| Lint | `ruff check .` or `eslint .` |
+| Task | Python | TypeScript | Rust | Go | C/C++ |
+|---|---|---|---|---|---|
+| **Install** | `uv sync` | `npm ci` | `cargo build` | `go mod download` | `cmake -B build && cmake --build build` |
+| **Run** | `python -m src.main` | `npm start` | `cargo run` | `go run ./cmd/...` | `./build/myapp` |
+| **Test** | `pytest tests/ --cov=src` | `npm test` | `cargo test` | `go test -race ./...` | `cd build && ctest` |
+| **Lint** | `ruff check . && mypy src/` | `npm run lint && tsc --noEmit` | `cargo clippy -- -D warnings` | `go vet ./...` | `clang-tidy src/**` |
+| **Format** | `black . && isort .` | `npx prettier --write .` | `cargo fmt` | `gofmt -w .` | `clang-format -i src/**` |
+| **Benchmark** | `pytest --benchmark-only` | `npm run bench` | `cargo bench` | `go test -bench=. -benchmem` | `./build/benchmarks` |
+| **Audit** | `pip audit` | `npm audit` | `cargo audit` | `govulncheck ./...` | Manual review |
+
+---
+
+## Project Structure Conventions
+
+```
+project/
+├── src/                    # Source code
+│   ├── core/               # Business logic (framework-independent)
+│   ├── api/                # HTTP/gRPC/CLI layer
+│   ├── models/             # Data types (Python: Pydantic, Rust: serde, Go: structs)
+│   ├── utils/              # Pure utility functions
+│   └── errors.*            # Error types (Python: errors.py, Rust: error.rs, Go: errors.go)
+├── tests/
+│   ├── unit/               # Pure logic tests
+│   ├── integration/        # API + DB + external service tests
+│   └── fixtures/           # Shared test data
+├── benches/                # Performance benchmarks
+├── scripts/                # Setup, deploy, utility scripts
+├── .github/workflows/      # CI configuration
+├── .env.example            # Environment template
+├── .gitignore              # Language-appropriate ignores
+├── README.md               # Setup + architecture + examples
+├── CHANGELOG.md            # Version history (libraries)
+└── [build file]            # Makefile / pyproject.toml / Cargo.toml / go.mod / CMakeLists.txt
+```
+
+---
+
+## Common Patterns
+
+### API/Web Response Format
+```json
+// Success
+{ "data": { ... }, "meta": { "request_id": "uuid", "timestamp": "ISO8601" } }
+
+// Error
+{ "error": { "code": "ERROR_CODE", "message": "Human readable", "details": [...] }, "meta": { ... } }
+```
+
+### Error Status Codes
+| Code | Meaning |
+|---|---|
+| 200 | Success |
+| 201 | Created |
+| 204 | Deleted (no content) |
+| 400 | Validation error |
+| 401 | Not authenticated |
+| 403 | Not authorized |
+| 404 | Not found |
+| 409 | Conflict |
+| 429 | Rate limited |
+| 500 | Internal error |
+
+### Configuration Loading
+```python
+# Python — always via env vars or config files
+import os
+from pathlib import Path
+
+DATABASE_URL = os.environ["DATABASE_URL"]  # KeyError if missing — good
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")  # Default if optional
+CONFIG_PATH = Path(os.getenv("CONFIG_PATH", "config.yaml"))
+```
+
+```rust
+// Rust — use config crate or explicit env loading
+use std::env;
+
+let db_url = env::var("DATABASE_URL")
+    .expect("DATABASE_URL must be set");
+let log_level = env::var("LOG_LEVEL")
+    .unwrap_or_else(|_| "info".to_string());
+```
+
+---
 
 ## Visual Validation (ALL GUI/Web Projects — MANDATORY)
 
-> **Lesson learned:** A project shipped with 327 tests, 0 lint errors, and a **completely blank page** because Gradio 6.x moved `theme`/`css` to `launch()`. Logic tests cannot see pixels. Visual validation is a separate, mandatory gate.
-
 **Rule: If users look at a screen to use your project, visual tests are required.**
 
-### What Always Required
-
 | Check | Requirement |
-|-------|-------------|
-| `tests/ui/` exists | Must exist for any project with visual output |
-| App starts | `test_app_starts_and_responds()` — root URL returns 200 |
-| Content visible | `test_app_renders_components()` — component tree has expected elements |
-| Handlers work | `test_handler_callbacks_execute()` — event callbacks run, return expected types |
-| No startup errors | `test_no_startup_errors()` — no ERROR/Traceback in stdout |
-| Version compat | `test_framework_version_compatibility()` — version in supported range |
-
-### Gradio Specific
-
-- **V0:** Gradio 6+ moved `theme`/`css` from `Blocks()` constructor → `launch()`. Always check.
-- **No `gr.update()`:** Return component instances directly: `gr.Dropdown(choices=...)` not `gr.update(choices=...)`
-- **Async handlers:** Use `async def` wrappers — never sync lambdas wrapping coroutines
-- **Pin major versions:** `gradio>=5.0,<7` — silent breaking changes happen between majors
-- **Test app factory:** `create_app()` must return valid `gr.Blocks` with all tabs and handlers wired
-- **Test launch lifecycle:** `app.launch()` + `app.close()` without crash
+|---|---|
+| App starts | Root URL returns 200 |
+| Content visible | Component tree has expected elements |
+| Handlers work | Event callbacks execute and return expected types |
+| No startup errors | Zero ERROR/Traceback in stdout |
+| DevTools console | Zero errors on load |
+| Container dimensions | Root element has non-zero width/height |
 
 ### Web/JS Specific
+- HTML entry must contain root element (`#app`, `#root`, `#canvas`)
+- Root element must have explicit `width`/`height` (not `height: 0`)
+- Canvas in DOM with non-zero `getBoundingClientRect()`
 
-- **Mount point:** HTML entry file must contain root element (`#app`, `#root`, `#canvas`)
-- **Container dimensions:** Root element must have explicit width/height (not `height: 0`)
-- **DevTools console:** Zero errors on startup — any error = FAIL
-- **Canvas visibility:** Canvas in DOM with non-zero `getBoundingClientRect()`
+---
 
-### What Counts as Visual FAIL
-
-- Blank page / blank screen (uniform color)
-- Spinner that never resolves
-- App starts but shows only title, no content
-- Clicking a button produces no visible change
-- Console errors on startup
-- Deprecated framework API warnings
-
-### Test Location
-
-```
-tests/
-└── ui/
-    ├── test_ui_integration.py   # App factory, wiring, lifecycle
-    ├── test_visual_smoke.py     # Startup, blank page, content visible
-    └── test_handlers.py         # Event handler callbacks
-```
-
-## Cache-Friendly Patterns
+## Cache-Friendly Patterns (for LLM Sessions)
 
 - Include full file context upfront (don't ask "what's in X?")
 - Use consistent naming across projects
-- Batch similar requests (3+ CAD designs, then 3+ code reviews)
+- Batch similar requests
 - Preserve tool outputs in context for multi-step work

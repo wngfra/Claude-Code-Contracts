@@ -7,8 +7,9 @@
 ## Project
 
 **Name:** [Project Name]
-**Language:** [Python / TypeScript / Go / Other]
-**Framework:** [FastAPI / Express / Flask / None / Other]
+**Language:** [Python / TypeScript / Rust / Go / C++]
+**Framework:** [FastAPI / Express / Axum / Gin / None / Other]
+**Type:** [Library / CLI / API Server / Microservice / Embedded / Other]
 **Duration Estimate:** [2h / 4h / 8h / Full day]
 
 ---
@@ -54,10 +55,84 @@ Example:
 
 ### Non-Functional
 
-- **Performance:** [e.g., "Process 100 issues in <30s"]
+- **Performance:** [e.g., "Process 100 issues in <30s", "p99 latency <100ms"]
 - **Reliability:** [e.g., "Retry on API failure, backoff strategy"]
 - **Scale:** [e.g., "Support 10k+ issues without memory issues"]
 - **Logging:** [e.g., "Debug logs for every API call"]
+
+---
+
+## Performance Budget
+
+**Define measurable targets. Leave blank if not performance-critical.**
+
+| Metric | Target | How to Measure |
+|---|---|---|
+| **Latency (p50)** | [e.g., <50ms] | [e.g., HTTP handler timing] |
+| **Latency (p99)** | [e.g., <200ms] | [e.g., percentile tracking] |
+| **Throughput** | [e.g., 1000 req/s] | [e.g., wrk/bombardier] |
+| **Memory (peak)** | [e.g., <256MB] | [e.g., heaptrack / RSS] |
+| **Startup time** | [e.g., <500ms] | [e.g., time to first request] |
+| **Binary size** | [e.g., <10MB] | [e.g., `ls -lh`] |
+
+**Hot paths to benchmark:**
+- [ ] [Function/endpoint that needs benchmarking]
+- [ ] [Another hot path]
+
+Example:
+```
+Latency (p50): <20ms for GET /weather
+Latency (p99): <100ms for GET /weather
+Throughput: 500 req/s sustained
+Memory: <128MB RSS under load
+Startup: <200ms
+
+Hot paths:
+- Cache lookup (called on every request)
+- API response parsing (CPU-bound)
+```
+
+---
+
+## Security Requirements
+
+**Leave defaults if not security-critical.**
+
+- **Input validation:** [e.g., "Validate all API params", "Sanitize HTML in user content"]
+- **Auth:** [e.g., "JWT bearer tokens", "API key in header", "None (internal tool)"]
+- **Secrets:** [e.g., "All in .env", "Use AWS Secrets Manager"]
+- **Network:** [e.g., "TLS only", "CORS configured for frontend domain"]
+- **Dependencies:** [e.g., "Zero known CVEs", "Audit before ship"]
+- **Data:** [e.g., "No PII in logs", "Encrypt at rest"]
+
+Example:
+```
+Input validation: All API params validated with schema (Zod/Pydantic)
+Auth: API key in X-API-Key header
+Secrets: All in .env, .env.example included
+Network: TLS required in production
+Dependencies: npm audit clean
+Data: No secrets in logs, mask sensitive fields
+```
+
+---
+
+## Concurrency Model
+
+**How should this handle concurrent work? Leave blank if single-threaded.**
+
+- **Model:** [e.g., "async/await", "thread pool", "goroutines", "tokio tasks"]
+- **Max concurrency:** [e.g., "10 concurrent requests", "unbounded"]
+- **Graceful shutdown:** [Yes/No — e.g., "Drain in-flight requests on SIGTERM"]
+- **Shared state:** [e.g., "None", "Read-only cache", "Mutex-protected counter"]
+
+Example:
+```
+Model: async/await with bounded semaphore
+Max concurrency: 50 concurrent API calls
+Graceful shutdown: Yes, drain on SIGINT/SIGTERM
+Shared state: In-memory cache with TTL (thread-safe)
+```
 
 ---
 
@@ -65,8 +140,9 @@ Example:
 
 - **Budget:** [Cost limit for API calls, compute, etc.]
 - **Dependencies:** [No external services / Use only stdlib / Must use X library]
-- **Compatibility:** [Python 3.10+, Node 18+, etc.]
-- **Deployment:** [Local CLI / Docker / Serverless / API server]
+- **Compatibility:** [Python 3.11+, Node 18+, Rust 1.75+, Go 1.22+, C++20]
+- **Deployment:** [Local CLI / Docker / Serverless / API server / Bare metal]
+- **Platforms:** [Linux, macOS, Windows, ARM, embedded]
 
 Example:
 ```
@@ -74,6 +150,7 @@ Example:
 - Must use Claude API (not other LLMs)
 - No GitHub Premium features (free tier only)
 - Runnable on M1 Mac and Ubuntu 22.04
+- Python 3.11+
 ```
 
 ---
@@ -155,11 +232,16 @@ response = client.messages.create(
 
 - [ ] All functional requirements working
 - [ ] Tests pass with ≥80% coverage
+- [ ] Benchmarks exist for hot paths
 - [ ] Setup script works (`setup.sh && make test`)
-- [ ] README has working examples
+- [ ] README has all required sections with working examples
+- [ ] CHANGELOG.md present with all changes documented
+- [ ] README and CHANGELOG synced with actual code
 - [ ] No console errors or warnings
 - [ ] Code is readable and well-documented
 - [ ] Error handling is explicit (no silent failures)
+- [ ] Security audit clean
+- [ ] CI workflow included
 
 ---
 
@@ -181,21 +263,46 @@ Example:
 
 ---
 
+## Documentation Requirements
+
+**README and CHANGELOG are mandatory deliverables. Customize expectations here.**
+
+### README Sections (all required by default)
+- [ ] Overview, Quick Start, Installation
+- [ ] Usage with working examples
+- [ ] Architecture diagram
+- [ ] Configuration table (env vars)
+- [ ] Testing, Performance, Deployment
+- [ ] Troubleshooting, Known Limitations
+
+**Additional README notes:**
+```
+[e.g., "Include Swagger link for API docs", "Add Docker Compose example"]
+```
+
+### CHANGELOG
+- [ ] Keep a Changelog format (default)
+- [ ] Initial entries under `[Unreleased]`
+
+---
+
 ## File Delivery
 
 **Where should output go?**
 
 ```
-/Users/alex/.openclaw/workspace/projects/[project-name]/
+./[project-name]/
 ├── src/
 ├── tests/
+├── benches/
+├── .github/workflows/
 ├── README.md
+├── CHANGELOG.md
 └── setup.sh
 ```
 
 **Format:**
-- [ ] Zip file
-- [ ] Individual files
+- [ ] Individual files (default)
 - [ ] Git repo (init + commit)
 
 ---
@@ -230,7 +337,7 @@ Copy this template, fill it out completely, and pass it to Claude Code with:
 
 ```
 system_prompt: "Generate code following CLAUDE-CODE-CONTRACT.md"
-files: [CLAUDE-CODE-CONTRACT.md, CODING-CONTEXT.md, TASK-BRIEF.md]
+files: [CLAUDE-CODE-CONTRACT.md, CODING-CONTEXT.md, TASK-BRIEF.md, prompts/PROMPT-CLAUDE-CODE-MASTER.md]
 ```
 
 **Don't start until TASK-BRIEF is complete.**

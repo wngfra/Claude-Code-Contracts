@@ -3,106 +3,125 @@
 ║  Complete Self-Contained Folder Structure                         ║
 ╚════════════════════════════════════════════════════════════════════╝
 
-Location: /Users/alex/.openclaw/workspace/claude-code-contracts/
+Location: [this repository root]
 
-├── README.md (9.2 KB)
+├── README.md
 │   └─ System overview, file guide, quick start instructions
 │
-├── START-HERE.md (4.7 KB) ⭐ READ FIRST
+├── START-HERE.md ⭐ READ FIRST
 │   └─ Quick 2-minute overview and 5-step getting started
 │
-├── MANIFEST.md (10 KB)
+├── MANIFEST.md
 │   └─ Complete file index, reading paths, system overview
 │
-├── DELIVERY-SUMMARY.md (11 KB)
+├── DELIVERY-SUMMARY.md
 │   └─ What you got, how to use it, quick checklist
 │
 ├── FILE-STRUCTURE.txt (this file)
 │   └─ Directory structure reference
 │
-├── CLAUDE-CODE-CONTRACT.md (12 KB) ⭐ CORE DOCUMENT
-│   └─ Quality standards, type hints, testing, documentation
-│   ├─ Section: Type Hints (100% Required)
-│   ├─ Section: Testing (≥80% Coverage)
-│   ├─ Section: Error Handling
-│   ├─ Section: Documentation
-│   ├─ Section: Project Structure
-│   ├─ Section: Python Standards
-│   ├─ Section: TypeScript Standards
-│   └─ Section: Pre-Delivery Checklist
+├── CLAUDE-CODE-CONTRACT.md ⭐ CORE DOCUMENT
+│   └─ Quality standards, type hints, testing, performance, security
+│   ├─ Core Principles
+│   ├─ Mandatory Deliverables (including benchmarks, CI)
+│   ├─ Architecture Standards (project type adaptations)
+│   ├─ Performance Contract (benchmarks, budgets)
+│   ├─ Security Contract (input validation, secrets, auditing)
+│   ├─ Concurrency Patterns (Python, Rust, Go, TypeScript)
+│   ├─ API Design Standards (REST conventions)
+│   ├─ CI/CD Templates (GitHub Actions per language)
+│   ├─ Python Standards
+│   ├─ TypeScript Standards
+│   ├─ Rust Standards (ownership, Result, clippy, tracing)
+│   ├─ Go Standards (table tests, race detector, slog)
+│   ├─ C/C++ Standards (CMake, RAII, ASan, GTest)
+│   ├─ Code Taste (subjective quality)
+│   └─ Pre-Delivery Checklist
 │
-├── CLAUDE-CODE-GUIDE.md (12 KB) ⭐ HOW-TO GUIDE
+├── CLAUDE-CODE-GUIDE.md ⭐ HOW-TO GUIDE
 │   └─ Complete walkthrough with examples
+│   ├─ Quick Start
 │   ├─ Step 1: Fill TASK-BRIEF.md
 │   ├─ Step 2: Spawn Claude Code Session
 │   ├─ Step 3: Claude Code Generates
 │   ├─ Step 4: Verify & Ship
-│   ├─ Example: GitHub Issue Triage System
-│   ├─ Customization Guidelines
-│   └─ Rejection Protocol
+│   ├─ Example: Full Rust API Workflow
+│   ├─ Rejection Protocol
+│   └─ Customization Guidelines
 │
-├── CLAUDE-CODE-CHEATSHEET.md (11 KB) ⭐ QUICK REFERENCE
+├── CLAUDE-CODE-CHEATSHEET.md ⭐ QUICK REFERENCE
 │   └─ Copy-paste templates, quick formulas, boilerplate
 │   ├─ TL;DR Formula
-│   ├─ Command to Spawn Claude Code
-│   ├─ Language-Specific Templates
+│   ├─ What Claude Code Delivers
+│   ├─ Verification Commands
+│   ├─ Language-Specific Templates (Python, TS, Rust, Go, C++)
 │   ├─ Quality Checklist
 │   ├─ Anti-Patterns (Never Accept)
 │   ├─ Common Issues & Fixes
 │   ├─ Pro Tips
-│   ├─ Boilerplate Code Snippets
 │   └─ Final Sanity Check
 │
-├── TASK-BRIEF-TEMPLATE.md (4.7 KB) ⭐ COPY FOR EACH PROJECT
+├── TASK-BRIEF-TEMPLATE.md ⭐ COPY FOR EACH PROJECT
 │   └─ Project requirements template
-│   ├─ Project (name, language, framework)
+│   ├─ Project (name, language, framework, type)
 │   ├─ Problem Statement
 │   ├─ Functional Requirements
-│   ├─ Non-Functional Requirements
+│   ├─ Performance Budget (latency, throughput, memory)
+│   ├─ Security Requirements
+│   ├─ Concurrency Model
 │   ├─ Constraints
 │   ├─ User Experience (Input/Output)
 │   ├─ Architecture Hints
 │   ├─ Success Criteria
-│   ├─ Known Unknowns
-│   └─ Notes
+│   └─ Known Unknowns
 │
-├── CODING-CONTEXT.md (4.2 KB) ⭐ LANGUAGE STANDARDS
-│   └─ Language-specific rules (Python, TypeScript, Go)
-│   ├─ Type Hints (Python/TypeScript)
-│   ├─ Formatting Standards
-│   ├─ Error Handling Patterns
-│   ├─ Logging Standards
-│   ├─ Testing Standards
-│   ├─ Cache-Friendly Patterns
-│   └─ Visual Validation (for UI projects)
+├── CODING-CONTEXT.md ⭐ LANGUAGE STANDARDS
+│   └─ Language-specific rules (Python, TS, Rust, Go, C/C++, Bash)
+│   ├─ Build Commands Quick Reference Table
+│   ├─ Project Structure Conventions
+│   ├─ Common Patterns (API responses, config loading)
+│   ├─ Visual Validation (for UI projects)
+│   └─ Cache-Friendly Patterns
 │
 └── prompts/
-    └─ PROMPT-CLAUDE-CODE-MASTER.md (9 KB) ⭐ MASTER PROMPT
+    └─ PROMPT-CLAUDE-CODE-MASTER.md ⭐ MASTER PROMPT
        └─ Complete prompt for Claude Code
        ├─ System Context
        ├─ Task Definition
-       ├─ Requirements (Architecture, Type System, Testing, etc.)
+       ├─ Requirements (Architecture, Types, Testing, Performance, Security)
+       ├─ Per-Language Instructions (Python, TS, Rust, Go, C++)
        ├─ Failure Modes
        ├─ Success Criteria
-       └─ Final Handoff Format
+       └─ Regeneration Protocol
 
 ════════════════════════════════════════════════════════════════════
 
-TOTAL: 100 KB, 11 files (8 markdown + 3 text), fully self-contained
+TOTAL: ~100 KB, 11 files, fully self-contained, zero dependencies
 
 ════════════════════════════════════════════════════════════════════
 
-🎯 CORE FILES (Attach These to Claude Code)
+CORE FILES (Attach These to Claude Code)
 
 When spawning a Claude Code session, attach:
-  1. CLAUDE-CODE-CONTRACT.md          (standards)
-  2. CODING-CONTEXT.md                 (language rules)
-  3. TASK-BRIEF.md                     (your project — copy from template)
+  1. CLAUDE-CODE-CONTRACT.md              (standards — authoritative)
+  2. CODING-CONTEXT.md                    (language rules)
+  3. TASK-BRIEF.md                        (your project — copy from template)
   4. prompts/PROMPT-CLAUDE-CODE-MASTER.md (what Claude sees)
 
 ════════════════════════════════════════════════════════════════════
 
-📖 READING PATHS
+SUPPORTED LANGUAGES
+
+  Python      — type hints, pytest, ruff, black, mypy, structlog
+  TypeScript  — strict mode, vitest, eslint, prettier, pino
+  Rust        — ownership, clippy, cargo test, criterion, tracing
+  Go          — race detector, go vet, slog, table-driven tests
+  C/C++       — CMake, RAII, ASan/UBSan, GTest, spdlog, clang-tidy
+  Bash        — ShellCheck, set -euo pipefail
+
+════════════════════════════════════════════════════════════════════
+
+READING PATHS
 
 Path 1: Fast Track (5 min)
   1. START-HERE.md
@@ -129,51 +148,46 @@ Path 4: Understanding (deep dive)
 
 ════════════════════════════════════════════════════════════════════
 
-✅ QUALITY STANDARDS (Always Enforced)
+QUALITY STANDARDS (Always Enforced)
 
 Every Claude Code project must deliver:
   ✓ 100% type hints on public APIs
   ✓ ≥80% test coverage (all tests pass)
+  ✓ Benchmarks for hot paths
   ✓ Zero TODOs (complete code)
   ✓ Zero linting warnings
   ✓ Zero type errors
+  ✓ Security audit clean
+  ✓ CI configuration included
   ✓ Working setup script (./setup.sh)
   ✓ Accurate README with examples
   ✓ Ready to git commit immediately
 
 ════════════════════════════════════════════════════════════════════
 
-🚀 HOW IT WORKS
+HOW IT WORKS
 
 1. Fill TASK-BRIEF.md
-   (your project name, language, 3 requirements, success criteria)
+   (your project name, language, requirements, performance budget)
 
 2. Attach 4 files to Claude Code
    (CONTRACT, CONTEXT, BRIEF, MASTER-PROMPT)
 
 3. Claude Code reads contract
-   (knows exact quality expectations)
+   (knows exact quality expectations for your language)
 
 4. Claude Code generates code
    (meeting all standards automatically)
 
 5. You verify
-   (make test, make lint, git status)
+   (make test, make lint, make bench, git status)
 
 6. You ship
    (code is production-ready, no iteration)
 
 ════════════════════════════════════════════════════════════════════
 
-📍 LOCATION
-
-/Users/alex/.openclaw/workspace/claude-code-contracts/
-
-👉 BOOKMARK THIS PATH — You'll use it for every Claude Code project
-
-════════════════════════════════════════════════════════════════════
-
-🎓 NEXT STEP
+NEXT STEP
 
 Open: START-HERE.md
 Then: Follow the quick start guide
