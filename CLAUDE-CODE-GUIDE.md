@@ -345,28 +345,6 @@ If the code doesn't meet standards:
 
 ---
 
-## Contract Violations (Auto-Reject)
-
-Any of these = reject the code and re-request:
-
-| Violation | Evidence | Action |
-|---|---|---|
-| Missing type hints | Linter shows errors | Re-request with strict enforcement |
-| Test failures | Test command shows failures | Re-request with passing tests |
-| Coverage <80% | Coverage report shows low % | Re-request with additional tests |
-| No benchmarks | `benches/` empty or missing | Re-request with benchmarks |
-| Setup broken | `setup.sh` fails | Re-request with working setup |
-| README outdated | Examples don't work | Re-request with verified examples |
-| README incomplete | Missing required sections | Re-request with all sections per spec |
-| Missing CHANGELOG | No CHANGELOG.md | Re-request with CHANGELOG in Keep a Changelog format |
-| Docs out of sync | README doesn't match code | Re-request with doc sync |
-| Lint warnings | Linter shows warnings | Re-request with clean lint |
-| Secrets in code | API keys in source files | Re-request with .env pattern |
-| No CI config | `.github/workflows/` missing | Re-request with CI configuration |
-| Unsafe without justification | `unsafe` blocks without SAFETY comment | Re-request safe version or documented unsafe |
-
----
-
 ## Customization
 
 ### For Your Own Standards

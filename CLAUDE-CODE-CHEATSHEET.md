@@ -279,91 +279,9 @@ valgrind --leak-check=full ./build/myapp # zero leaks
 
 ---
 
-## 6. Quality Checklist (Auto-Rejected if Fails)
+## 6. Common Issues & Fixes
 
-```
-Before returning:
-
-Source Code:
-☐ All files present (no placeholders)
-☐ No TODOs or comments like "// TODO:"
-☐ Clear, descriptive variable names (no `x`, `temp`, `thing`)
-☐ Proper error handling (no silent failures)
-☐ No unsafe code without SAFETY justification
-
-Type System:
-☐ Python: 100% type hints (mypy --strict passes)
-☐ TypeScript: Strict mode (tsc --noEmit passes, zero `any`)
-☐ Rust: All public items documented (cargo doc)
-☐ Go: All exported funcs documented (godoc)
-☐ C/C++: const correctness, [[nodiscard]] on pure functions
-
-Tests:
-☐ Tests exist (tests/ directory)
-☐ All tests pass (zero failures)
-☐ Coverage >=80% (checked with --cov / --coverage flag)
-☐ No skipped tests (@skip, t.Skip, #[ignore])
-☐ Unit + integration tests present
-☐ Parametrized/table-driven tests for multiple inputs
-
-Benchmarks:
-☐ benches/ directory exists
-☐ Hot paths have benchmarks
-☐ Benchmarks compile and run clean
-
-Security:
-☐ No secrets in code (checked .env.example)
-☐ All external inputs validated
-☐ Dependency audit clean (pip audit / npm audit / cargo audit)
-☐ No raw memory operations without bounds checking (C/C++)
-
-Tooling:
-☐ Makefile / build scripts working
-☐ Linting configured and passing (zero warnings)
-☐ Type checking configured and passing
-☐ .env.example present with all vars
-☐ setup.sh / install script present
-☐ .github/workflows/ci.yml present
-
-Documentation:
-☐ README.md has all required sections (Overview, Quick Start, Installation, Usage, Architecture, Configuration, Testing, Performance, Troubleshooting, Known Limitations, Changelog link)
-☐ All README examples actually work (tested)
-☐ CHANGELOG.md present with all changes under [Unreleased]
-☐ README and CHANGELOG synced with current code
-☐ Performance numbers are from actual benchmark runs
-
-Git:
-☐ .gitignore correct (language-appropriate)
-☐ Ready to git add . && git commit -m "feat: initial [project]"
-```
-
----
-
-## 7. Anti-Patterns (Never Accept)
-
-| Pattern | Why It Fails |
-|---|---|
-| **Code with TODOs** | Incomplete work |
-| **Missing type hints** | Unmaintainable, poor IDE support |
-| **Tests that skip** | False positive coverage |
-| **No benchmarks** | Performance is unknown |
-| **Cryptic names** | Unmaintainable |
-| **Silent error handling** | Debugging nightmare |
-| **Setup requires manual steps** | Breaks first-run experience |
-| **README examples don't work** | Unusable documentation |
-| **README missing required sections** | Incomplete documentation |
-| **Missing or stale CHANGELOG** | No change history |
-| **Code changed without doc sync** | Docs drift from reality |
-| **Linting warnings** | Quality debt |
-| **Coverage <80%** | Untested code |
-| **Secrets in code** | Security issue |
-| **No CI config** | Regressions undetected |
-| **Unsafe without justification** | Memory safety risk |
-| **Unbounded queues** | OOM under load |
-
----
-
-## 8. Common Issues & Fixes
+> **Full quality checklist and rejection criteria:** See `CLAUDE-CODE-CONTRACT.md` §Pre-Delivery Checklist.
 
 ### "Code generation is slow"
 - **Cause:** Large project in one go
@@ -395,7 +313,7 @@ Git:
 
 ---
 
-## 9. Pro Tips
+## 7. Pro Tips
 
 ### Tip 1: Batch Similar Tasks
 ```
@@ -447,35 +365,6 @@ def cache_users(ttl: int = 300):
 
 ---
 
-## 10. Final Sanity Check
-
-Before you ship, ask yourself:
-
-```
-☐ Would I be proud to show this to other engineers?
-☐ Could someone clone this and run it immediately?
-☐ Are all error cases handled explicitly?
-☐ Is the code easy to modify 6 months from now?
-☐ Did I test the examples in the README?
-☐ Does the README have all required sections?
-☐ Is the CHANGELOG up to date with all changes?
-☐ Do the README and CHANGELOG match the actual code?
-☐ Does setup work on a fresh machine?
-☐ Are there benchmarks for the critical paths?
-☐ Would this pass a security review?
-```
-
-If any answer is "no", it's not ready.
-
 ---
-
-## Remember
 
 > **Quality is not about perfection. It's about clarity, completeness, and care.**
-
-Use this cheat sheet to enforce that. Every time.
-
----
-
-**Last Updated:** March 2026  
-**Version:** 2.0

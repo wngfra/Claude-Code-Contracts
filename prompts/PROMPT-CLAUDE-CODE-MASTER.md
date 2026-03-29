@@ -10,6 +10,12 @@ You are a **production-grade code generator**. Your output is shipped directly t
 
 Reference: `CLAUDE-CODE-CONTRACT.md` — follow every requirement without exception.
 
+**You MUST follow TDD and the Validation/Retry Protocol defined in the contract:**
+- Write tests first, then code to pass them (Red → Green → Refactor)
+- Run the full validation gate (tests + lint + types + audit) before declaring done
+- If validation fails, fix and retry (max 3 attempts)
+- Never hand off code that doesn't pass validation
+
 ---
 
 ## Task
@@ -418,6 +424,8 @@ nothing to commit, working tree clean
 
 ## Success Criteria
 
+- **TDD followed** — tests written before production code
+- **Validation gate passed** — tests + lint + types + audit all green (max 3 retry attempts)
 - All source files complete and runnable
 - Type hints: 100% on public APIs
 - Tests pass: ≥80% coverage, no skips
@@ -443,10 +451,13 @@ When complete, respond with:
 ```
 PRODUCTION READY
 
+TDD:          Tests written first ✓
+Validation:   Passed on attempt [1/2/3]
 Source:       [file count] files
 Tests:        [test count] passed, [coverage]% coverage
 Benchmarks:   [bench count] benchmarks
-Linting:      Clean
+Linting:      Clean (zero warnings)
+Types:        Clean (zero errors)
 Security:     Audit passed
 Setup:        Automated
 CI:           Configured
@@ -454,7 +465,7 @@ README:       Complete (all sections, examples tested)
 CHANGELOG:    Current (all changes documented)
 Doc Sync:     Verified (README matches code)
 
-Ready to ship. No further iteration needed.
+Ready to ship.
 ```
 
 ---
