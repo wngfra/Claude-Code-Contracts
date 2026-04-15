@@ -416,6 +416,7 @@ project/
 ├── .github/workflows/ci.yml
 ├── scripts/
 │   └── setup.sh
+├── CLAUDE.md               # Project-specific coding contracts (see CLAUDE.md Generation Spec)
 ├── README.md               # Full README (see README Generation Spec)
 ├── CHANGELOG.md            # Version history (Keep a Changelog format)
 ├── .env.example
@@ -475,6 +476,7 @@ nothing to commit, working tree clean
 - Coverage under 80% on changed files
 - Secrets in code
 - No CI configuration (Generate/Full Rewrite)
+- Missing or generic CLAUDE.md (Generate/Full Rewrite) — must be project-specific
 - Unsafe code without justification
 - Unbounded queues or missing graceful shutdown
 - **UI projects:** Missing visual regression tests
@@ -505,6 +507,7 @@ Applicable items depend on scenario (see task table above and contract § Mandat
 - Setup: one-command setup succeeds first try
 - README: Complete (all sections per spec), examples work when copy-pasted
 - CHANGELOG: Present with all changes documented under `[Unreleased]`
+- CLAUDE.md: Present, project-specific, validation commands match actual build system
 - Configuration: `.env.example` complete
 - CI: workflow file present and correct
 
@@ -538,6 +541,7 @@ Setup:        Automated
 CI:           Configured
 README:       [Complete / Updated sections: ...]
 CHANGELOG:    [Current / Entry added under Unreleased]
+CLAUDE.md:    [Present / Updated]
 Doc Sync:     Verified
 
 # Include for UI projects:

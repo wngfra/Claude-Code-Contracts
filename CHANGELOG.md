@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Visual/a11y acceptance criteria examples in PHASE-BRIEF-TEMPLATE
 - Visual Validation and Accessibility sections (steps 11-12) in Master Generator prompt
 - Accessibility validation section in CODING-CONTEXT with tool commands and quick reference
+- CLAUDE.md Generation Spec — mandatory deliverable for Generate/Full Rewrite that embeds project-specific coding contracts into the generated project for coherent incremental Claude Code work
 
 ### Changed
 - Mandatory deliverables now scale by mode — Debug/Refactor no longer require benchmarks, setup scripts, CI config, or full README from scratch

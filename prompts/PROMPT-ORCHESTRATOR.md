@@ -65,7 +65,7 @@ For each ready phase (all dependencies passed):
 
 After all phases pass:
 
-1. **Merge per-phase fragments.** Concatenate `PHASES/PHASE-NN-CHANGELOG.md` files in phase order into the root `CHANGELOG.md` under the appropriate version heading. Update root `README.md` with any user-visible changes the phases recorded in their fragments. This is the only point at which `CHANGELOG.md` and `README.md` are written.
+1. **Merge per-phase fragments and generate CLAUDE.md.** Concatenate `PHASES/PHASE-NN-CHANGELOG.md` files in phase order into the root `CHANGELOG.md` under the appropriate version heading. Update root `README.md` with any user-visible changes the phases recorded in their fragments. Generate `CLAUDE.md` at the project root following `CLAUDE-CODE-CONTRACT.md § CLAUDE.md Generation Spec` — it must reflect the actual project as built across all phases: real validation commands, real project structure, real error types, real conventions. This is the only point at which `CHANGELOG.md`, `README.md`, and `CLAUDE.md` are written.
 2. **Run cross-phase integration tests.** Before dispatching the integration Reviewer, verify that phases compose correctly:
    - Run the full project test suite at the project root — not just per-phase tests. This catches interface mismatches between phases.
    - If the project has end-to-end tests (`e2e/`, `tests/e2e/`), run them. If it doesn't and should (multi-module projects, API + client, frontend + backend), dispatch an Implementer to create a minimal e2e test suite as a synthetic `PHASE-E2E` phase (with its own brief, checkpoint, and review loop).

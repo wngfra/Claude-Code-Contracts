@@ -164,6 +164,7 @@ Defined in `CLAUDE-CODE-CONTRACT.md`. Deliverables scale by mode (not every sess
 - Working setup script, CI configuration
 - Comprehensive README with tested examples
 - CHANGELOG.md in Keep a Changelog format
+- CLAUDE.md with project-specific coding contracts for incremental work
 
 **UI projects (all applicable modes):**
 - Visual regression tests (screenshot baselines)
@@ -174,6 +175,18 @@ Defined in `CLAUDE-CODE-CONTRACT.md`. Deliverables scale by mode (not every sess
 **Doc sync:** README and CHANGELOG updated for behavior-changing code changes. Internal refactors and test-only changes are exempt.
 
 Code that violates any applicable standard is rejected with a specific fix request.
+
+---
+
+## CLAUDE.md — From Generation to Incremental Work
+
+The contract system is designed for large-scale code generation. Once the project is generated, developers switch to Claude Code for incremental modifications (bug fixes, feature additions, refactors). The generated `CLAUDE.md` bridges this transition:
+
+1. **During generation** — the contract system produces a project-specific `CLAUDE.md` as a mandatory deliverable (Generate / Full Rewrite modes).
+2. **After generation** — developers use Claude Code normally. The `CLAUDE.md` is automatically loaded by Claude Code and ensures the same quality standards without re-attaching the full contract system.
+3. **During incremental work** — if a modification changes project conventions, validation commands, or architecture, the developer updates `CLAUDE.md` as part of that change.
+
+The `CLAUDE.md` contains: distilled quality standards, the project's exact validation commands, language-specific conventions, project structure, documentation sync rules, error handling patterns, and security requirements. See `CLAUDE-CODE-CONTRACT.md § CLAUDE.md Generation Spec` for the full specification.
 
 ---
 

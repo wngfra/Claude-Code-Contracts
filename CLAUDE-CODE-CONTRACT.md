@@ -277,6 +277,7 @@ All universal deliverables, plus:
 | **CI Config** | GitHub Actions workflow (or equivalent) for lint + test + build |
 | **Visual Tests** | Screenshot regression tests (if UI project — see Visual Validation Contract) |
 | **Accessibility** | WCAG 2.1 AA compliance (if UI project — see Accessibility Contract) |
+| **CLAUDE.md** | Project-specific coding contracts for incremental Claude Code work (see CLAUDE.md Generation Spec) |
 
 ### Debug / Fix
 
@@ -454,6 +455,173 @@ project/
 - Model definitions scattered across files
 - Utility functions with hidden state
 - "Misc" folders or generic `helpers.py`
+
+---
+
+## CLAUDE.md Generation Spec
+
+**Every generated project (Generate / Full Rewrite) must include a `CLAUDE.md` at the project root.** This file embeds the essential coding contracts into the project so that subsequent Claude Code sessions — for incremental fixes, feature additions, refactors — follow the same quality standards without re-attaching the full contract system.
+
+The `CLAUDE.md` is a working document, not a copy of the contract. It must be **project-specific**: tailored to the project's language, framework, architecture, and conventions as they exist in the generated code.
+
+### Required Sections
+
+```markdown
+# CLAUDE.md
+
+## Project Overview
+[One paragraph: what this project is, primary language, framework, project type (library/CLI/API/web app/mobile app).]
+
+## Quality Standards
+
+### Core Principles
+1. Think before you type — non-trivial logic requires a Design Thinking Gate (DESIGN-NOTE.md) before tests.
+2. Test-Driven Development — RED → GREEN → REFACTOR → VALIDATE. Every change starts with a test.
+3. Validate before done — tests + lint + type-check + audit must all pass.
+4. No placeholder code — every function is production-grade or removed.
+5. Taste matters — clear naming, minimal nesting (early returns), one responsibility per function.
+6. Security by default — validate inputs at boundaries, never trust external data.
+
+### Design Thinking Gate
+Required when: algorithms beyond linear scan, data-structure choices with >1 option, concurrency/ordering concerns, recursive/graph/optimization problems.
+Not required when: pure CRUD wiring, renaming, trivial config changes, obvious glue code without concurrency.
+Output: DESIGN-NOTE.md with invariants, core subproblem, data structure choice (with rejected alternatives), trade-off, ≤10-line pseudocode, edge cases.
+
+### TDD Workflow
+1. RED — Write a failing test describing desired behavior
+2. GREEN — Write minimum code to pass
+3. REFACTOR — Clean up, keep tests green
+4. VALIDATE — Run full validation gate
+5. RETRY — If validation fails, fix and re-run (max 3 attempts; stop on churn)
+
+## Coding Conventions
+
+### [Language]
+[Include ONLY the project's language(s). Distill from CODING-CONTEXT.md:]
+- Formatter and config (e.g., "black, 100 char lines")
+- Linter and strictness level (e.g., "ruff; mypy --strict")
+- Error handling pattern (e.g., "Custom hierarchy from ApplicationError")
+- Logging library and pattern (e.g., "structlog with structured key-value pairs")
+- Naming conventions
+- Minimum language/runtime version
+
+## Validation Commands
+
+Run these before declaring any change complete:
+
+\`\`\`bash
+# Tests (≥80% coverage on changed files, zero failures, zero skips)
+[exact test command for this project]
+
+# Lint (zero warnings)
+[exact lint command]
+
+# Type check
+[exact type-check command]
+
+# Security audit
+[exact audit command]
+
+# Benchmarks (if applicable)
+[exact bench command]
+\`\`\`
+
+## Project Structure
+
+\`\`\`
+[ASCII tree of the actual generated project structure with brief annotations]
+\`\`\`
+
+- Core logic: [path] — independent of framework
+- API layer: [path] — thin routing + validation
+- Models: [path] — single source of truth for data structures
+- Tests: [path] — unit/, integration/, fixtures/
+- Benchmarks: [path]
+
+## Documentation Sync
+
+Every code change affecting behavior, APIs, configuration, or architecture **must** include:
+- **README.md** update for affected sections (Usage, API Reference, Configuration, Architecture)
+- **CHANGELOG.md** entry under `[Unreleased]` with correct category (Added/Changed/Deprecated/Removed/Fixed/Security)
+
+Exempt: internal refactors, test-only changes, CI config changes, dependency bumps without behavior change.
+
+A code change without doc sync is not done.
+
+## Security
+
+- All external inputs validated at the boundary (API params, CLI args, file reads, env vars)
+- Zero secrets in code — use `.env` and `os.getenv()` / `process.env` / equivalent
+- Dependencies pinned, lock file committed, audit clean
+- [Include project-specific security notes: auth pattern, rate limiting, CORS policy, etc.]
+
+## Error Handling
+
+- Custom error types: [list the project's error classes/types and when to use each]
+- Errors include context: what failed, with what input, why
+- Never swallow errors silently
+
+## Performance
+
+- Hot paths with benchmarks: [list the benchmarked functions/paths]
+- Performance budgets: [from task brief, if specified]
+- [Any project-specific performance notes]
+```
+
+### Conditional Sections
+
+Include these only when applicable:
+
+**UI projects** — add after Performance:
+```markdown
+## Visual Validation
+- Screenshot regression tests in [path] (Playwright/Cypress/swift-snapshot-testing)
+- Responsive breakpoints: 320px, 768px, 1024px, 1440px
+- No console errors on load
+- Dark/light mode both render correctly (if supported)
+
+## Accessibility
+- WCAG 2.1 AA compliance required
+- Automated: axe-core / Lighthouse ≥90 / performAccessibilityAudit()
+- Keyboard navigation for all interactive elements
+- Color contrast ≥4.5:1 (normal text), ≥3:1 (large text)
+- Semantic HTML / proper accessibility labels
+```
+
+**API projects** — add:
+```markdown
+## API Conventions
+- URL structure: [the project's URL pattern]
+- Response format: [the project's response envelope]
+- Error format: [the project's error response structure]
+- Status codes: [which codes this project uses and when]
+- Pagination: [the project's pagination pattern]
+```
+
+**Concurrency-heavy projects** — add:
+```markdown
+## Concurrency
+- Model: [async/await, actors, goroutines, thread pool, etc.]
+- Bounded concurrency: [how the project limits parallelism]
+- Shared state: [synchronization approach]
+- Graceful shutdown: [how SIGTERM/SIGINT is handled]
+```
+
+### CLAUDE.md Quality Rules
+
+- **Project-specific, not generic.** Every section references the actual project's files, commands, and patterns. A CLAUDE.md that could apply to any project is rejected.
+- **Validation commands must be exact.** Copy-paste from the project's Makefile/package.json/Cargo.toml — not generic placeholders.
+- **Error types must list the actual classes.** Not "custom error classes" but "ValidationError, NotFoundError, DatabaseError."
+- **Project structure must match reality.** The ASCII tree reflects the actual generated file layout.
+- **Concise but complete.** Target 150–300 lines. This is a working reference, not a tutorial.
+- **No contract jargon.** The CLAUDE.md is for Claude Code sessions that have never seen the contract system. Write it as standalone project guidance.
+
+### When CLAUDE.md is NOT required
+
+- Debug / Fix — the project already has (or should have) its own CLAUDE.md
+- Refactor — same as debug; if CLAUDE.md exists, update it if the refactor changes conventions
+- Add / Remove / Modify Function — update CLAUDE.md only if the change affects project conventions, validation commands, or architecture
+- Partial Rewrite — update CLAUDE.md if the rewrite changes the module structure or conventions described in it
 
 ---
 
@@ -2535,6 +2703,7 @@ Before returning code, verify the items applicable to your mode. Not every item 
 - [ ] **Logging added** — INFO/DEBUG/ERROR levels appropriate, no blind spots
 - [ ] **CI config present** — `.github/workflows/ci.yml` (or equivalent) included
 - [ ] **Concurrency safe** — no data races, bounded queues, graceful shutdown
+- [ ] **CLAUDE.md present** — project-specific, validation commands exact, structure matches reality
 
 ### UI Projects Only (Generate / Full Rewrite / Partial Rewrite)
 - [ ] **Visual regression tests** — screenshot baselines created, tests pass
@@ -2576,6 +2745,7 @@ Setup:        Automated
 CI:           Configured
 README:       Complete (all sections, examples tested)
 CHANGELOG:    Current (all changes documented)
+CLAUDE.md:    Present (project-specific, commands verified)
 Doc Sync:     Verified (README matches code)
 
 # Include for UI projects:
