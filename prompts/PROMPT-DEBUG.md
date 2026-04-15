@@ -58,6 +58,8 @@ Produce a `DEBUG-REPORT.md` section with:
 - [ ] **Expected behavior:** What should happen instead?
 - [ ] **Reproduction steps:** How to trigger the bug (command, input, sequence)
 - [ ] **Root cause analysis:** Why does the bug occur? (trace the code path)
+- [ ] **Invariant violated:** State the invariant the buggy code breaks (input/output/state). If you cannot name it, you have not found the root cause yet — keep digging. See `THINKING-FRAMEWORKS.md § Clarify the Invariants` and `CLAUDE-CODE-CONTRACT.md § Design Thinking Gate`.
+- [ ] **Why the original code violated it:** the wrong assumption, missing edge case, or incorrect data-structure choice.
 - [ ] **Affected scope:** What files/functions are involved?
 - [ ] **Impact assessment:** What else could break? Are there related bugs?
 

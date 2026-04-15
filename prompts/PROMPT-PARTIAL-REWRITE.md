@@ -56,7 +56,7 @@ Produce a `REWRITE-PLAN.md` section with:
 - [ ] **Scope:** Exactly which files/modules are being rewritten
 - [ ] **Reason:** Why refactoring isn't sufficient (tech debt, architecture, performance)
 - [ ] **Current interface:** Public API surface of the module being replaced
-- [ ] **New design:** How the replacement is structured
+- [ ] **New design:** How the replacement is structured. For any non-trivial logic, run the Design Thinking Gate (`CLAUDE-CODE-CONTRACT.md § Design Thinking Gate`, toolkit in `THINKING-FRAMEWORKS.md`) and embed its output here: invariants, core subproblem + canonical shape, chosen data structure with rejected alternatives, trade-off, ≤10-line pseudocode, edge cases.
 - [ ] **Boundary contracts:** What callers expect (function signatures, error types, behavior)
 - [ ] **Breaking changes:** Any intentional API changes (with migration instructions)
 - [ ] **Risk assessment:** What could go wrong, what's the rollback plan

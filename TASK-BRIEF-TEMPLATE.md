@@ -7,10 +7,12 @@
 ## Project
 
 **Name:** [Project Name]
-**Language:** [Python / TypeScript / Rust / Go / C++]
-**Framework:** [FastAPI / Express / Axum / Gin / None / Other]
-**Type:** [Library / CLI / API Server / Microservice / Embedded / Other]
+**Language:** [Python / TypeScript / Rust / Go / C++ / Swift]
+**Framework:** [FastAPI / Express / Axum / Gin / SwiftUI / UIKit / None / Other]
+**Type:** [Library / CLI / API Server / Microservice / iOS App / macOS App / Embedded / Other]
 **Duration Estimate:** [2h / 4h / 8h / Full day]
+**Mode:** [Single-agent / Orchestrate]   ← use Orchestrate for large multi-phase projects (see `MULTI-AGENT-FRAMEWORK.md`)
+**max_review_iterations:** 3   ← Orchestrate mode only. Per-phase cap on the Reviewer→Fixer loop. Distinct from the contract's validation-retry cap. Raise only if you understand the cost.
 
 ---
 
@@ -136,11 +138,54 @@ Shared state: In-memory cache with TTL (thread-safe)
 
 ---
 
+## UI / Visual Requirements (Skip if no UI)
+
+**Leave blank for CLI tools, libraries, API servers, and embedded systems.**
+
+### Design Reference
+- **Design spec / mockup:** [Figma URL, screenshot path, or "agent decides"]
+- **Design system:** [Tailwind, Material UI, shadcn/ui, custom, none]
+- **Theme:** [Light only / Dark only / Both / System preference]
+- **Responsive breakpoints:** [e.g., "320px mobile, 768px tablet, 1024px desktop, 1440px wide"]
+
+### Visual Acceptance Criteria
+- [ ] [e.g., "Homepage matches Figma mockup within 5% pixel diff"]
+- [ ] [e.g., "Navigation bar sticky on scroll"]
+- [ ] [e.g., "Form validation errors shown inline in red"]
+- [ ] [e.g., "Loading skeleton shown during API calls"]
+
+### Accessibility Requirements
+- **WCAG level:** [AA (default) / AAA]
+- **Screen reader tested:** [Yes / No / Not required]
+- **Keyboard-only navigation:** [Required (default for web) / Not required]
+- **Color contrast:** [≥4.5:1 normal text, ≥3:1 large text (WCAG AA default)]
+- **Reduced motion:** [Respect `prefers-reduced-motion` (default) / Not applicable]
+
+Example:
+```
+Design spec: Figma link or "clean minimal design, agent decides"
+Design system: Tailwind + shadcn/ui
+Theme: Both (dark/light), system preference default
+Breakpoints: 375px, 768px, 1280px
+
+Visual criteria:
+- [ ] Dashboard renders data table with sortable columns
+- [ ] Chart animates on load, respects reduced-motion
+- [ ] Empty state shows illustration + CTA button
+
+Accessibility:
+- WCAG AA
+- Keyboard navigation required
+- Screen reader: tested with VoiceOver
+```
+
+---
+
 ## Constraints
 
 - **Budget:** [Cost limit for API calls, compute, etc.]
 - **Dependencies:** [No external services / Use only stdlib / Must use X library]
-- **Compatibility:** [Python 3.11+, Node 18+, Rust 1.75+, Go 1.22+, C++20]
+- **Compatibility:** [Python 3.11+, Node 18+, Rust 1.75+, Go 1.22+, C++20, Swift 6.0+ / iOS 17+]
 - **Deployment:** [Local CLI / Docker / Serverless / API server / Bare metal]
 - **Platforms:** [Linux, macOS, Windows, ARM, embedded]
 
@@ -228,20 +273,24 @@ response = client.messages.create(
 
 ## Success Criteria
 
-**The code is done when:**
+**The code is done when (check items applicable to your mode — see contract § Mandatory Deliverables):**
 
 - [ ] All functional requirements working
-- [ ] Tests pass with ≥80% coverage
-- [ ] Benchmarks exist for hot paths
-- [ ] Setup script works (`setup.sh && make test`)
-- [ ] README has all required sections with working examples
-- [ ] CHANGELOG.md present with all changes documented
+- [ ] Tests pass with ≥80% coverage on changed files
+- [ ] Benchmarks exist for hot paths (Generate/Full Rewrite mode)
+- [ ] Setup script works (Generate/Full Rewrite mode)
+- [ ] README has all required sections with working examples (Generate mode; other modes: affected sections updated)
+- [ ] CHANGELOG.md present with changes documented (behavior-changing modes)
 - [ ] README and CHANGELOG synced with actual code
 - [ ] No console errors or warnings
 - [ ] Code is readable and well-documented
 - [ ] Error handling is explicit (no silent failures)
-- [ ] Security audit clean
-- [ ] CI workflow included
+- [ ] Security audit clean (Generate/Full Rewrite mode)
+- [ ] CI workflow included (Generate/Full Rewrite mode)
+- [ ] Visual regression tests pass (UI projects)
+- [ ] Accessibility audit passes — Lighthouse ≥90, zero critical violations (UI projects)
+- [ ] Responsive at all specified breakpoints (UI projects)
+- [ ] Keyboard navigation works for all interactive elements (UI projects)
 
 ---
 

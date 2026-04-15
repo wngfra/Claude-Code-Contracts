@@ -1,6 +1,20 @@
 # Claude Code Production Contracts
 
-A contract system that ensures Claude generates production-grade code: fully typed, tested, benchmarked, documented, and ready to ship. Supports **four task modes** — generating new projects, refactoring, debugging, and partial rewrites.
+A contract system that ensures Claude generates production-grade code: fully typed, tested, benchmarked, documented, and ready to ship.
+
+Supports **eight task scenarios** across five prompt modes:
+
+| Scenario | Prompt Mode | Use When |
+|---|---|---|
+| **Generate** | Master Generator | Building a new project or module from scratch |
+| **Debug / Fix** | Debug | Finding and fixing bugs in existing code |
+| **Refactor** | Refactor | Restructuring existing code without changing behavior |
+| **Partial Rewrite** | Partial Rewrite | Replacing a module with a new implementation |
+| **Full Rewrite** | Master Generator | Rebuilding an entire codebase from scratch |
+| **Add Function** | Master Generator | Adding new functions/endpoints/commands to existing code |
+| **Remove Function** | Master Generator | Removing functions and all references |
+| **Modify Behavior** | Master Generator | Changing how existing code works |
+| **Orchestrate** | Orchestrator | Large multi-phase projects with independent review/validation loops |
 
 Works with **Claude Code CLI**, **claude.ai**, or the **Claude API**. No external dependencies. Just Markdown files.
 
@@ -48,25 +62,34 @@ If something fails, tell Claude exactly what's wrong and ask for a fix.
 ```
 claude-code-contracts/
 ├── README.md                              ← you are here
+├── CHANGELOG.md                           ← version history (Keep a Changelog format)
 ├── CLAUDE-CODE-CONTRACT.md                ← quality standards (attach to every session)
 ├── CLAUDE-CODE-GUIDE.md                   ← detailed walkthrough with examples
 ├── CLAUDE-CODE-CHEATSHEET.md              ← quick reference & copy-paste templates
 ├── THINKING-FRAMEWORKS.md                 ← problem decomposition & algorithm design
+├── MULTI-AGENT-FRAMEWORK.md               ← Orchestrator/Implementer/Reviewer pipeline
 ├── TASK-BRIEF-TEMPLATE.md                 ← copy this for each task
+├── PHASE-BRIEF-TEMPLATE.md                ← per-phase brief (multi-agent mode)
 ├── CODING-CONTEXT.md                      ← language-specific rules
 └── prompts/
     ├── PROMPT-CLAUDE-CODE-MASTER.md       ← Generate mode (new projects)
     ├── PROMPT-REFACTOR.md                 ← Refactor mode (restructure existing code)
     ├── PROMPT-DEBUG.md                    ← Debug mode (find and fix bugs)
-    └── PROMPT-PARTIAL-REWRITE.md          ← Partial Rewrite mode (replace a module)
+    ├── PROMPT-PARTIAL-REWRITE.md          ← Partial Rewrite mode (replace a module)
+    ├── PROMPT-ORCHESTRATOR.md             ← Orchestrate mode (lead agent)
+    ├── PROMPT-IMPLEMENTER.md              ← phase worker subagent
+    └── PROMPT-REVIEWER.md                 ← independent review subagent
 ```
 
 | Task | Prompt to Attach |
 |---|---|
 | Build something new | `prompts/PROMPT-CLAUDE-CODE-MASTER.md` |
+| Add/remove/modify functions | `prompts/PROMPT-CLAUDE-CODE-MASTER.md` |
+| Full rewrite | `prompts/PROMPT-CLAUDE-CODE-MASTER.md` |
 | Restructure existing code | `prompts/PROMPT-REFACTOR.md` |
 | Fix a specific bug | `prompts/PROMPT-DEBUG.md` |
 | Replace a module/component | `prompts/PROMPT-PARTIAL-REWRITE.md` |
+| Large multi-phase project | `prompts/PROMPT-ORCHESTRATOR.md` + `MULTI-AGENT-FRAMEWORK.md` |
 
 ---
 
@@ -93,22 +116,64 @@ For large projects, split across sessions: core types → API layer → test sui
 
 ---
 
+## Contract Workflow
+
+Every code change follows this pipeline:
+
+1. **Design Thinking Gate** — For non-trivial logic, algorithms, data structure choices, or design trade-offs, produce a `DESIGN-NOTE.md` before writing any test. The agent decides whether the gate is required or optional and states the decision explicitly. Required criteria take priority over optional criteria when they overlap.
+2. **TDD** — RED (write failing test) → GREEN (write minimal code) → REFACTOR (clean up) → VALIDATE → RETRY (max 3 attempts).
+3. **Validation** — Tests (>=80% coverage on changed files), lint (zero warnings), type-checking, security audit, benchmarks (if applicable per mode). UI projects add: visual regression tests, accessibility audit.
+4. **Documentation Sync** — README and CHANGELOG updates required for behavior-changing code changes. Internal refactors and test-only changes are exempt.
+
+---
+
+## Documentation Sync Contract
+
+Every code change affecting behavior, APIs, configuration, or architecture **must** include corresponding README and CHANGELOG updates. Stale docs are treated as bugs with the same severity as failing tests.
+
+| Code Change | README Update | CHANGELOG Update |
+|---|---|---|
+| New function/endpoint/command | Add to Usage / API Reference | `### Added` |
+| Changed function signature/behavior | Update examples | `### Changed` |
+| Removed function/endpoint | Remove from docs | `### Removed` |
+| New config option / env var | Add to Configuration table | `### Added` |
+| Performance improvement | Update Performance numbers | `### Changed` |
+| Bug fix | Update Troubleshooting if relevant | `### Fixed` |
+| Architecture change | Update Architecture diagram | `### Changed` |
+| Security fix | Update relevant sections | `### Security` |
+| Setup process change | Update Quick Start / Installation | `### Changed` |
+
+CHANGELOG format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) with [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
 ## Quality Standards
 
-Defined in `CLAUDE-CODE-CONTRACT.md`. Non-negotiable:
+Defined in `CLAUDE-CODE-CONTRACT.md`. Deliverables scale by mode (not every session requires a full project):
 
-- 100% type hints on public APIs
-- >= 80% test coverage, all tests pass, zero skipped
-- Benchmarks for hot paths
+**Universal (all modes):**
+- 100% type hints on public APIs in changed code
+- >= 80% test coverage on changed files, all tests pass, zero skipped
 - Zero TODOs, zero lint/type warnings
-- Security audit clean, no secrets in code
+- No secrets in code
+- Ready to git commit immediately
+
+**Generate / Full Rewrite (new projects):**
+- Benchmarks for hot paths
+- Security audit clean
 - Working setup script, CI configuration
 - Comprehensive README with tested examples
 - CHANGELOG.md in Keep a Changelog format
-- README and CHANGELOG always synced with code changes
-- Ready to git commit immediately
 
-Code that violates any standard is rejected with a specific fix request.
+**UI projects (all applicable modes):**
+- Visual regression tests (screenshot baselines)
+- Accessibility audit (WCAG 2.1 AA, Lighthouse ≥90)
+- Responsive at specified breakpoints
+- Keyboard navigable, semantic HTML
+
+**Doc sync:** README and CHANGELOG updated for behavior-changing code changes. Internal refactors and test-only changes are exempt.
+
+Code that violates any applicable standard is rejected with a specific fix request.
 
 ---
 
@@ -116,12 +181,13 @@ Code that violates any standard is rejected with a specific fix request.
 
 | File | When to read |
 |---|---|
-| `CLAUDE-CODE-GUIDE.md` | First time — full walkthrough with examples for all 4 modes |
+| `CLAUDE-CODE-GUIDE.md` | First time — full walkthrough with examples for all 5 modes |
 | `CLAUDE-CODE-CHEATSHEET.md` | During a project — quick reference & copy-paste templates |
 | `CLAUDE-CODE-CONTRACT.md` | When reviewing output against standards |
 | `THINKING-FRAMEWORKS.md` | Complex tasks — problem decomposition, algorithms, novel domains |
+| `MULTI-AGENT-FRAMEWORK.md` | Large projects — orchestrator/implementer/reviewer pipeline |
 | `CODING-CONTEXT.md` | When customizing for your language/project |
 
 ---
 
-**Version:** 2.0 | **Languages:** Python, TypeScript, Rust, Go, C/C++, Bash
+**Version:** 2.1 | **Languages:** Python, TypeScript, Rust, Go, C/C++, Swift, Bash

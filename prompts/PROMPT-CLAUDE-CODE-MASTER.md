@@ -20,11 +20,31 @@ Reference: `CLAUDE-CODE-CONTRACT.md` — follow every requirement without except
 
 ## Task
 
-**Generate [PROJECT_NAME] — [BRIEF_DESCRIPTION]**
+**[SCENARIO] [PROJECT_NAME] — [BRIEF_DESCRIPTION]**
+
+This prompt covers multiple scenarios. Adapt deliverables to the scenario:
+
+| Scenario | What to Deliver |
+|---|---|
+| **Generate** | Full project from scratch — all deliverables per contract |
+| **Full Rewrite** | Rebuild existing codebase — all deliverables per contract |
+| **Add Function** | New endpoint/command/feature — tests, CHANGELOG, README update for affected sections |
+| **Remove Function** | Remove code + all references — update tests, CHANGELOG (`Removed`), README |
+| **Modify Behavior** | Change existing logic — update tests to reflect new behavior, CHANGELOG (`Changed`), README |
+
+See `CLAUDE-CODE-CONTRACT.md § Mandatory Deliverables (Scaled by Mode)` for the full breakdown. Do not produce a full README/CI/setup for Add/Remove/Modify scenarios — update only what changed.
 
 ---
 
 ## Requirements
+
+### 0. Design Thinking Gate (BEFORE any tests or code)
+
+If this project contains **any** non-trivial logic, algorithm, data-structure choice, or design trade-off, you MUST run the Design Thinking Gate from `CLAUDE-CODE-CONTRACT.md § Design Thinking Gate` using `THINKING-FRAMEWORKS.md` as your reasoning toolkit. Produce `DESIGN-NOTE.md` at the project root containing: invariants, core subproblem + canonical shape, chosen data structure (with rejected alternatives), trade-off, ≤10-line pseudocode, and the edge cases the tests must cover.
+
+Only skip this gate for pure CRUD wiring or trivial glue. When in doubt, run it.
+
+The failing tests in step 2 must be derived from the pseudocode and edge-case list in `DESIGN-NOTE.md`. If you find yourself writing code that contradicts the design note, stop and update the note first — do not let the implementation drift silently.
 
 ### 1. Architecture
 - [ ] Module structure follows project type (see CLAUDE-CODE-CONTRACT.md for library/CLI/API patterns)
@@ -61,6 +81,13 @@ Reference: `CLAUDE-CODE-CONTRACT.md` — follow every requirement without except
 - `const` correctness throughout
 - `[[nodiscard]]` on functions that return values
 - Compile with `-Wall -Wextra -Wpedantic -Werror` — zero warnings
+
+**Swift:** All public APIs documented with `///` doc comments
+- Use `Sendable` conformance for types crossing concurrency boundaries
+- Strict concurrency enabled (`-strict-concurrency=complete`) — zero warnings
+- Use typed throws (`throws(MyError)`) for library APIs
+- Use `@Observable` (not `ObservableObject`) for SwiftUI view models (Observation framework)
+- Run `swift build` — must compile clean. Run `swiftlint --strict` — zero warnings
 
 ### 3. Testing (Minimum 80% Coverage)
 
@@ -114,6 +141,13 @@ go test -bench=. -benchmem ./...
 # C/C++
 cd build && ctest --output-on-failure
 ./build/benchmarks
+
+# Swift (SPM)
+swift test --enable-code-coverage
+swift package benchmark
+
+# Swift (Xcode)
+xcodebuild test -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 16' -enableCodeCoverage YES
 ```
 
 All tests must **pass**, coverage ≥80%, **zero skipped tests**.
@@ -302,10 +336,36 @@ Include a `.github/workflows/ci.yml` that runs on every push/PR:
 - Type check
 - Tests with coverage
 - Security audit (if tool exists)
+- Visual regression tests (UI projects)
+- Accessibility audit (UI projects)
 
 See CLAUDE-CODE-CONTRACT.md for language-specific CI templates.
 
-### 11. Git Ready
+### 11. Visual Validation (UI Projects Only)
+
+If this project renders a UI (web app, desktop app, mobile app):
+
+- [ ] Screenshot regression tests in `tests/visual/` or `e2e/` (Playwright recommended)
+- [ ] Test at responsive breakpoints (320px, 768px, 1024px, 1440px minimum)
+- [ ] No browser console errors on page load
+- [ ] Loading states for async operations (no blank screens)
+- [ ] Dark/light mode both render correctly (if supported)
+
+See `CLAUDE-CODE-CONTRACT.md § Visual Validation Contract` for full spec.
+
+### 12. Accessibility (UI Projects Only)
+
+If this project renders a UI:
+
+- [ ] WCAG 2.1 AA compliance (see `CLAUDE-CODE-CONTRACT.md § Accessibility Contract`)
+- [ ] axe-core or Lighthouse accessibility audit in CI — score ≥ 90
+- [ ] Semantic HTML (proper elements, no `<div>` buttons)
+- [ ] Keyboard navigation for all interactive elements
+- [ ] ARIA labels on elements without visible text
+- [ ] Color contrast ≥ 4.5:1 (normal text), ≥ 3:1 (large text)
+- [ ] `prefers-reduced-motion` respected for animations
+
+### 13. Git Ready
 
 **.gitignore** — language-appropriate patterns included.
 **First commit** — `git add . && git commit -m "feat: Initial [project] implementation"`
@@ -404,66 +464,86 @@ nothing to commit, working tree clean
 - Code with TODOs or stubs
 - Missing type hints (even one function)
 - Tests that skip, fail, or don't exist
-- No benchmarks for hot paths
+- No benchmarks for hot paths (Generate/Full Rewrite)
 - Cryptic variable names (`x`, `temp_var`, `thing`)
 - Silent errors or empty try/except/catch blocks
-- `.env.example` missing or incomplete
-- README that's out of date or missing required sections
+- `.env.example` missing or incomplete (Generate/Full Rewrite)
+- README that's out of date or missing required sections (Generate: full README; other modes: affected sections)
 - README examples that don't match actual code
-- Missing CHANGELOG.md or stale changelog
-- Code changes without corresponding README/CHANGELOG updates
-- Code that needs "just install X first" instructions
+- Missing CHANGELOG.md or stale changelog (behavior-changing modes)
 - Linting warnings
-- Coverage under 80%
+- Coverage under 80% on changed files
 - Secrets in code
-- No CI configuration
+- No CI configuration (Generate/Full Rewrite)
 - Unsafe code without justification
 - Unbounded queues or missing graceful shutdown
+- **UI projects:** Missing visual regression tests
+- **UI projects:** Accessibility violations (WCAG 2.1 AA failures)
+- **UI projects:** Non-semantic HTML (`<div>` with click handler instead of `<button>`)
+- **UI projects:** Missing keyboard navigation
+- **UI projects:** `outline: none` without visible focus replacement
 
 ---
 
 ## Success Criteria
 
+Applicable items depend on scenario (see task table above and contract § Mandatory Deliverables):
+
 - **TDD followed** — tests written before production code
 - **Validation gate passed** — tests + lint + types + audit all green (max 3 retry attempts)
-- All source files complete and runnable
-- Type hints: 100% on public APIs
-- Tests pass: ≥80% coverage, no skips
-- Benchmarks: present for all hot paths
+- All changed source files complete and runnable
+- Type hints: 100% on public APIs in changed code
+- Tests pass: ≥80% coverage on changed files, no skips
 - Linting: Zero warnings or errors
-- Security: audit clean, no secrets in code
-- Setup: `setup.sh && make test` succeeds first try
-- README: Complete (all sections per spec), examples work when copy-pasted
-- CHANGELOG: Present with all changes documented under `[Unreleased]`
-- Doc sync: README examples match actual code, config table matches env vars
-- Configuration: `.env.example` complete
 - Error messages: Clear and actionable
 - Code taste: Readable, well-named, minimal nesting
 - Git-ready: `git add .` and clean status
+
+**Generate / Full Rewrite additionally:**
+- Benchmarks: present for all hot paths
+- Security: audit clean, no secrets in code
+- Setup: one-command setup succeeds first try
+- README: Complete (all sections per spec), examples work when copy-pasted
+- CHANGELOG: Present with all changes documented under `[Unreleased]`
+- Configuration: `.env.example` complete
 - CI: workflow file present and correct
+
+**UI projects additionally:**
+- Visual regression: screenshot tests pass, zero unexpected diffs
+- Accessibility: WCAG 2.1 AA, Lighthouse ≥90, axe-core zero violations
+- Responsive: layout correct at specified breakpoints
+- Keyboard: all interactive elements navigable
 
 ---
 
 ## Final Handoff
 
-When complete, respond with:
+When complete, respond with items applicable to your scenario:
 
 ```
 PRODUCTION READY
 
+Scenario:     [Generate / Add Function / Remove Function / Modify Behavior / Full Rewrite]
 TDD:          Tests written first ✓
 Validation:   Passed on attempt [1/2/3]
-Source:       [file count] files
+Source:       [file count] files changed
 Tests:        [test count] passed, [coverage]% coverage
-Benchmarks:   [bench count] benchmarks
 Linting:      Clean (zero warnings)
 Types:        Clean (zero errors)
+
+# Include if applicable:
+Benchmarks:   [bench count] benchmarks
 Security:     Audit passed
 Setup:        Automated
 CI:           Configured
-README:       Complete (all sections, examples tested)
-CHANGELOG:    Current (all changes documented)
-Doc Sync:     Verified (README matches code)
+README:       [Complete / Updated sections: ...]
+CHANGELOG:    [Current / Entry added under Unreleased]
+Doc Sync:     Verified
+
+# Include for UI projects:
+Visual Tests: [count] screenshots, zero diffs
+Accessibility: Lighthouse [score], axe-core [count] violations
+Responsive:   Verified at [breakpoints]
 
 Ready to ship.
 ```

@@ -61,6 +61,7 @@ Before making any changes, analyze and document:
 - [ ] **What tests cover this code** — list relevant test files
 - [ ] **What the refactoring goal is** — name the specific smell or improvement
 - [ ] **What will NOT change** — public API, return types, error behavior
+- [ ] **Trade-off named** — every refactor exchanges one property for another (readability ↔ perf, flexibility ↔ simplicity, locality ↔ reuse). State it explicitly. If the refactor introduces or replaces an algorithm or data structure, run the Design Thinking Gate (`CLAUDE-CODE-CONTRACT.md § Design Thinking Gate`, toolkit in `THINKING-FRAMEWORKS.md`) and embed its output here.
 
 Output this as a `REFACTOR-PLAN.md` section in your response before writing code.
 
